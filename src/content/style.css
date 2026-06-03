@@ -502,6 +502,60 @@ body {
   transform: rotate(90deg);
 }
 
+/* エクスポートポップアップ */
+.mv-export-popover {
+  position: absolute;
+  bottom: 3.5rem; /* ツールバーのすぐ上 */
+  right: 0;
+  z-index: 1060;
+  width: 150px; /* 見やすくてコンパクトな幅 */
+  background-color: var(--mv-btn-bg);
+  border: 1px solid var(--mv-btn-border);
+  border-radius: 0.8rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  padding: 0.3rem;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.mv-export-popover.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.mv-export-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--mv-btn-color);
+  background: transparent;
+  border: none;
+  border-radius: 0.5rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  width: 100%;
+}
+
+.mv-export-item:hover {
+  background-color: var(--mv-btn-hover-bg);
+}
+
+.mv-export-item svg {
+  flex-shrink: 0;
+}
+
 /* 印刷用スタイル */
 @media print {
   body {
@@ -518,7 +572,8 @@ body {
   .mv-toolbar,
   .mv-offcanvas,
   .mv-offcanvas-backdrop,
-  .mv-toc-wrapper {
+  .mv-toc-wrapper,
+  .mv-export-popover {
     display: none !important;
   }
 }

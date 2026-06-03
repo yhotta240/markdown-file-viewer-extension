@@ -5,6 +5,7 @@ import { DEFAULT_SETTINGS, type Settings } from "../settings";
 import { escapeHtml } from "../utils/html";
 import { clearLogs, getLogs } from "../utils/logger";
 import { getSettings, setSettings } from "../utils/storage";
+import { exportMarkdown, exportPdf, exportRawHtml, exportStyledHtml } from "./export";
 
 // SVGアイコン定数
 const ICON_EYE_FILL = `
@@ -17,6 +18,20 @@ const ICON_EYE_FILL = `
 const ICON_CODE_SLASH = `
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
     <path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0m6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0"/>
+  </svg>
+`;
+
+const ICON_PRINTER = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
+    <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1"/>
+  </svg>
+`;
+
+const ICON_EXPORT = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+    <path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1z"/>
+    <path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 1.707V10.5a.5.5 0 0 1-1 0V1.707L5.354 3.854a.5.5 0 1 1-.708-.708z"/>
   </svg>
 `;
 
@@ -134,12 +149,57 @@ export function buildControlPanel(
     
     <div class="mv-toolbar-divider"></div>
     
+    <!-- 印刷 -->
+    <button type="button" class="mv-toolbar-btn" id="mv-print-button" title="印刷する (P)">
+      ${ICON_PRINTER}
+    </button>
+    
+    <div class="mv-toolbar-divider"></div>
+
+    <!-- エクスポート -->
+    <button type="button" class="mv-toolbar-btn" id="mv-export-button" title="エクスポート">
+      ${ICON_EXPORT}
+    </button>
+    
+    <div class="mv-toolbar-divider"></div>
+    
     <!-- 設定を開く -->
     <button type="button" class="mv-toolbar-btn" id="mv-gear-button" title="設定を開く (T)">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
         <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
       </svg>
     </button>
+
+    <!-- エクスポートポップアップメニュー -->
+    <div class="mv-export-popover" id="mv-export-popover">
+      <button type="button" class="mv-export-item" id="mv-export-pdf">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+          <path d="M4.603 12.087a.08.08 0 0 1-.059-.014c-.018-.013-.03-.037-.03-.071v-.78c0-.034.012-.057.03-.07a.08.08 0 0 1 .06-.015h.392c.11 0 .195-.022.253-.065.058-.043.087-.113.087-.21 0-.102-.03-.173-.088-.213-.058-.04-.143-.06-.252-.06H4.603a.08.08 0 0 1-.06-.015c-.018-.013-.03-.037-.03-.07v-.4c0-.032.012-.056.03-.069a.08.08 0 0 1 .06-.015h1.22c.036 0 .06.012.072.036a.1.1 0 0 1 .012.067v.4c0 .034-.008.056-.025.068a.08.08 0 0 1-.059.015h-.234v.24h.234c.036 0 .06.012.072.036a.1.1 0 0 1 .012.067v.4c0 .034-.008.056-.025.068a.08.08 0 0 1-.059.015h-.234v.463c0 .034-.012.058-.03.07a.08.08 0 0 1-.06.015h-.355zm2.146 0a.08.08 0 0 1-.06-.014c-.018-.013-.03-.037-.03-.071V9.584c0-.034.012-.057.03-.07a.08.08 0 0 1 .06-.015h.67c.28 0 .493.076.64.228.147.15.22.37.22.656 0 .28-.073.497-.22.65-.147.153-.36.23-.64.23h-.355v.78c0 .034-.012.057-.03.07a.08.08 0 0 1-.06.015zm.61-1.258h.273c.126 0 .219-.028.277-.083.058-.055.088-.145.088-.27 0-.12-.03-.207-.088-.26-.058-.053-.15-.08-.277-.08h-.273zm3.228 1.258a.08.08 0 0 1-.06-.014c-.018-.013-.03-.037-.03-.071V9.584c0-.034.012-.057.03-.07a.08.08 0 0 1 .06-.015h1.22c.036 0 .06.012.072.036a.1.1 0 0 1 .012.067v.4c0 .034-.008.056-.025.068a.08.08 0 0 1-.059.015h-.906v.4h.738c.036 0 .06.012.072.036a.1.1 0 0 1 .012.067v.4c0 .034-.008.056-.025.068a.08.08 0 0 1-.059.015h-.738v.78c0 .034-.012.057-.03.07a.08.08 0 0 1-.06.015z"/>
+        </svg>
+        <span>PDF</span>
+      </button>
+      <button type="button" class="mv-export-item" id="mv-export-styled-html">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+          <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+        </svg>
+        <span>Styled HTML</span>
+      </button>
+      <button type="button" class="mv-export-item" id="mv-export-raw-html">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0m6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0"/>
+        </svg>
+        <span>Raw HTML</span>
+      </button>
+      <button type="button" class="mv-export-item" id="mv-export-md">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5zM11.5 4v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+          <path fill-rule="evenodd" d="M8 5.5a.5.5 0 0 0-1 0v3.793L5.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L9 9.293z"/>
+        </svg>
+        <span>Markdown</span>
+      </button>
+    </div>
   `;
   appRoot.appendChild(toolbar);
 
@@ -345,6 +405,17 @@ export function buildControlPanel(
   );
 }
 
+// 安全なファイル名を作成するヘルパー
+function getSafeFilename(title: string): string {
+  let name = title;
+  if (name.toLowerCase().endsWith(".md")) {
+    name = name.slice(0, -3);
+  } else if (name.toLowerCase().endsWith(".markdown")) {
+    name = name.slice(0, -9);
+  }
+  return name.replace(/[\\/:*?"<>|]/g, "_").trim() || "document";
+}
+
 function setupPanelEvents(
   offcanvas: HTMLElement,
   backdrop: HTMLElement,
@@ -357,6 +428,9 @@ function setupPanelEvents(
   const gearBtn = toolbar.querySelector("#mv-gear-button") as HTMLElement;
   const copyBtn = toolbar.querySelector("#mv-copy-button") as HTMLElement;
   const toggleViewBtn = toolbar.querySelector("#mv-toggle-view") as HTMLButtonElement;
+  const printBtn = toolbar.querySelector("#mv-print-button") as HTMLElement;
+  const exportBtn = toolbar.querySelector("#mv-export-button") as HTMLElement;
+  const exportPopover = toolbar.querySelector("#mv-export-popover") as HTMLElement;
 
   const logsDetails = offcanvas.querySelector("#mv-logs-details") as HTMLDetailsElement;
   const logsContainer = offcanvas.querySelector("#mv-logs-container") as HTMLElement;
@@ -402,7 +476,82 @@ function setupPanelEvents(
       } else {
         openPanel();
       }
+    } else if ((e.key === "p" || e.key === "P") && document.activeElement === document.body) {
+      e.preventDefault();
+      window.print();
     }
+  });
+
+  // 印刷ボタン
+  printBtn.addEventListener("click", () => {
+    window.print();
+  });
+
+  // エクスポートメニューのポップアップ表示・非表示制御 (ホバー & クリック)
+  let popoverTimeout: number | null = null;
+  const showPopover = () => {
+    if (popoverTimeout) {
+      clearTimeout(popoverTimeout);
+      popoverTimeout = null;
+    }
+    exportPopover.classList.add("show");
+  };
+
+  const hidePopover = () => {
+    popoverTimeout = window.setTimeout(() => {
+      exportPopover.classList.remove("show");
+    }, 150);
+  };
+
+  exportBtn.addEventListener("mouseenter", showPopover);
+  exportBtn.addEventListener("mouseleave", hidePopover);
+  exportPopover.addEventListener("mouseenter", showPopover);
+  exportPopover.addEventListener("mouseleave", hidePopover);
+
+  exportBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    exportPopover.classList.toggle("show");
+  });
+
+  document.addEventListener("click", () => {
+    exportPopover.classList.remove("show");
+  });
+
+  exportPopover.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  // 各エクスポートアクションのバインド
+  exportPopover.querySelector("#mv-export-pdf")?.addEventListener("click", () => {
+    exportPdf();
+    exportPopover.classList.remove("show");
+  });
+
+  exportPopover.querySelector("#mv-export-styled-html")?.addEventListener("click", () => {
+    const previewRender = document.getElementById("mv-preview-render");
+    if (previewRender) {
+      const title = document.title || "Exported Document";
+      const filename = `${getSafeFilename(title)}.html`;
+      exportStyledHtml(previewRender.innerHTML, title, filename);
+    }
+    exportPopover.classList.remove("show");
+  });
+
+  exportPopover.querySelector("#mv-export-raw-html")?.addEventListener("click", () => {
+    const previewRender = document.getElementById("mv-preview-render");
+    if (previewRender) {
+      const title = document.title || "Exported Document";
+      const filename = `${getSafeFilename(title)}_raw.html`;
+      exportRawHtml(previewRender.innerHTML, filename);
+    }
+    exportPopover.classList.remove("show");
+  });
+
+  exportPopover.querySelector("#mv-export-md")?.addEventListener("click", () => {
+    const title = document.title || "Exported Document";
+    const filename = `${getSafeFilename(title)}.md`;
+    exportMarkdown(markdownText, filename);
+    exportPopover.classList.remove("show");
   });
 
   // コピーボタン
