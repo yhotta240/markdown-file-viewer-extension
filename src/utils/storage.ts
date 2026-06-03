@@ -1,8 +1,8 @@
 import { DEFAULT_SETTINGS, type Settings } from "../settings";
 
-export async function getSettings(): Promise<Settings> {
+export async function getSettings(): Promise<Required<Settings>> {
   const data = await getStorage<{ settings?: Settings }>("settings");
-  return data.settings ?? DEFAULT_SETTINGS;
+  return { ...DEFAULT_SETTINGS, ...data.settings };
 }
 
 export async function isEnabled(): Promise<boolean> {

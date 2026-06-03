@@ -1,3 +1,16 @@
+interface DocItem {
+  metadata: {
+    id: string;
+    title: string;
+    order: number;
+    visible: boolean;
+    expanded: boolean;
+    date: string;
+    lang: string;
+  };
+  content: string;
+}
+
 declare module "*CHANGELOG.md" {
   import type { VersionItem } from "../popup/types";
   const changelog: VersionItem[];
@@ -5,7 +18,6 @@ declare module "*CHANGELOG.md" {
 }
 
 declare module "*.md" {
-  import type { DocItem } from "../popup/types";
   const doc: DocItem;
   export default doc;
 }

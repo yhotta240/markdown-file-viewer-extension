@@ -1,30 +1,10 @@
-import type { Settings } from "../settings";
+import privacyDoc from "../../docs/privacy.md";
+import shortcutsDoc from "../../docs/shortcuts.md";
+import usageDoc from "../../docs/usage.md";
+import { DEFAULT_SETTINGS, type Settings } from "../settings";
 import { escapeHtml } from "../utils/html";
 import { clearLogs, getLogs } from "../utils/logger";
 import { getSettings, setSettings } from "../utils/storage";
-
-// プレビュー用の詳細設定型定義
-export interface PreviewSettings extends Settings {
-  theme?: "light" | "dark" | "auto" | "custom";
-  fontSize?: number;
-  viewMode?: "preview" | "source";
-  notifications?: boolean;
-  fontFamily?: string;
-  customFg?: string;
-  customBg?: string;
-  maxWidth?: number;
-}
-
-const DEFAULT_PREVIEW_SETTINGS: PreviewSettings = {
-  theme: "auto",
-  fontSize: 16,
-  viewMode: "preview",
-  notifications: true,
-  fontFamily: "system",
-  customFg: "#191b1f",
-  customBg: "#ffffff",
-  maxWidth: 860,
-};
 
 // SVGアイコン定数
 const ICON_EYE_FILL = `
@@ -110,6 +90,27 @@ export function buildControlPanel(
   markdownText: string,
   onViewModeChange: (mode: "preview" | "source") => void,
 ): void {
+  // ドキュメントマークダウンの読み込みと動的構築
+  const docs = [usageDoc, shortcutsDoc, privacyDoc]
+    .filter((doc) => doc.metadata.visible)
+    .sort((a, b) => a.metadata.order - b.metadata.order);
+
+  const docsHtml = docs
+    .map((doc) => {
+      const expandedAttr = doc.metadata.expanded ? "open" : "";
+      return `
+        <details class="mv-doc-details border rounded p-2 mb-2 bg-body-tertiary" ${expandedAttr}>
+          <summary class="fw-semibold text-secondary small" style="cursor: pointer; user-select: none;">${escapeHtml(
+            doc.metadata.title,
+          )}</summary>
+          <div class="mt-2 small text-muted">
+            ${doc.content}
+          </div>
+        </details>
+      `;
+    })
+    .join("");
+
   // 1. 統合ツールバーの作成
   const toolbar = document.createElement("div");
   toolbar.className = "mv-toolbar";
@@ -279,34 +280,7 @@ export function buildControlPanel(
       <!-- 3. ドキュメント -->
       <div class="mb-4">
         <h6 class="fw-bold mb-3 small text-uppercase tracking-wider text-muted">ドキュメント</h6>
-        
-        <details class="mv-doc-details border rounded p-2 mb-2 bg-body-tertiary">
-          <summary class="fw-semibold text-secondary small" style="cursor: pointer; user-select: none;">使い方</summary>
-          <div class="mt-2 small text-muted">
-            ローカルの <code>.md</code> または <code>.markdown</code> ファイルをブラウザにドラッグ＆ドロップするだけで、自動的に美しいプレビューが表示されます。
-            <br><br>
-            拡張機能アイコンをクリックすると、全体の有効・無効を切り替えることができます。
-          </div>
-        </details>
-
-        <details class="mv-doc-details border rounded p-2 mb-2 bg-body-tertiary">
-          <summary class="fw-semibold text-secondary small" style="cursor: pointer; user-select: none;">キーボードショートカット</summary>
-          <div class="mt-2 small text-muted">
-            プレビュー表示時に以下のキーが有効です。
-            <ul class="ps-3 mb-0 mt-1">
-              <li><code>Esc</code>: 設定パネルを閉じる</li>
-              <li><code>T</code>: 設定パネルをトグルする</li>
-              <li><code>S</code>: プレビュー / ソース表示のトグル切り替え</li>
-            </ul>
-          </div>
-        </details>
-        
-        <details class="mv-doc-details border rounded p-2 mb-2 bg-body-tertiary">
-          <summary class="fw-semibold text-secondary small" style="cursor: pointer; user-select: none;">プライバシーポリシー</summary>
-          <div class="mt-2 small text-muted">
-            本拡張機能は、ユーザーのローカルファイルを外部のサーバーに送信することはありません。マークダウンの解析や設定の保存はすべてブラウザ上のローカル環境（JavaScriptとChrome Storage）で完結して実行されます。
-          </div>
-        </details>
+        ${docsHtml}
       </div>
 
       <hr class="my-4 text-muted">
@@ -479,10 +453,10 @@ function setupPanelEvents(
   const maxWidthSlider = offcanvas.querySelector("#mv-max-width-slider") as HTMLInputElement;
   const maxWidthBadge = offcanvas.querySelector("#mv-max-width-badge") as HTMLElement;
 
-  let currentSettings: PreviewSettings = { ...DEFAULT_PREVIEW_SETTINGS };
+  let currentSettings: Required<Settings> = { ...DEFAULT_SETTINGS };
 
   // 設定を DOM とプレビュー画面に適用する
-  const applySettingsToDOM = (settings: PreviewSettings) => {
+  const applySettingsToDOM = (settings: Required<Settings>) => {
     const htmlEl = document.documentElement;
 
     // 1. 表示モードの適用
@@ -503,8 +477,8 @@ function setupPanelEvents(
       if (radio) radio.checked = true;
 
       if (settings.theme === "custom") {
-        const fg = settings.customFg || DEFAULT_PREVIEW_SETTINGS.customFg || "#191b1f";
-        const bg = settings.customBg || DEFAULT_PREVIEW_SETTINGS.customBg || "#ffffff";
+        const fg = settings.customFg || DEFAULT_SETTINGS.customFg || "#191b1f";
+        const bg = settings.customBg || DEFAULT_SETTINGS.customBg || "#ffffff";
 
         customFgInput.value = fg;
         customBgInput.value = bg;
@@ -595,22 +569,12 @@ function setupPanelEvents(
 
   // 初期設定のロード
   getSettings().then((settings) => {
-    const typedSettings = settings as PreviewSettings;
-    currentSettings = {
-      theme: typedSettings.theme ?? DEFAULT_PREVIEW_SETTINGS.theme,
-      fontSize: typedSettings.fontSize ?? DEFAULT_PREVIEW_SETTINGS.fontSize,
-      viewMode: typedSettings.viewMode ?? DEFAULT_PREVIEW_SETTINGS.viewMode,
-      notifications: typedSettings.notifications ?? DEFAULT_PREVIEW_SETTINGS.notifications,
-      fontFamily: typedSettings.fontFamily ?? DEFAULT_PREVIEW_SETTINGS.fontFamily,
-      customFg: typedSettings.customFg ?? DEFAULT_PREVIEW_SETTINGS.customFg,
-      customBg: typedSettings.customBg ?? DEFAULT_PREVIEW_SETTINGS.customBg,
-      maxWidth: typedSettings.maxWidth ?? DEFAULT_PREVIEW_SETTINGS.maxWidth,
-    };
+    currentSettings = { ...settings };
     applySettingsToDOM(currentSettings);
   });
 
   // 設定変更時の保存・適用
-  const saveAndApply = async (newSettings: Partial<PreviewSettings>) => {
+  const saveAndApply = async (newSettings: Partial<Settings>) => {
     currentSettings = { ...currentSettings, ...newSettings };
     applySettingsToDOM(currentSettings);
     await setSettings(currentSettings);
@@ -723,7 +687,7 @@ function setupPanelEvents(
   // 設定リセットボタン (カラーテーマ等の影響を受けない)
   offcanvas.querySelector("#mv-settings-reset-btn")?.addEventListener("click", async () => {
     if (confirm("表示設定を初期状態（デフォルト）に戻しますか？")) {
-      await saveAndApply(DEFAULT_PREVIEW_SETTINGS);
+      await saveAndApply(DEFAULT_SETTINGS);
     }
   });
 
