@@ -1,4 +1,4 @@
-# Markdown File Viewer Extension
+# Markdown File Viewer
 
 ブラウザで Markdown ファイルを快適に閲覧するための Chrome 拡張機能です。シンプルな UI と豊富な機能で、Markdown ファイルの内容を見やすく整理し、必要な情報に素早くアクセスできます。
 

@@ -1,6 +1,6 @@
 {
 	"name": "markdown-file-viewer-extension",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "ローカルおよび Web 上の Markdown ファイルを表示するシンプルなビューアー",
 	"main": "index.js",
 	"scripts": {
@@ -10,6 +10,9 @@
 		"build": "npm run check && npm run typecheck && cross-env NODE_ENV=production webpack",
 		"build:dev": "cross-env NODE_ENV=development webpack",
 		"watch": "cross-env NODE_ENV=development webpack --watch",
+		"version:patch": "exr version patch --manifest ./public/manifest.prod.json",
+		"version:minor": "exr version minor --manifest ./public/manifest.prod.json",
+		"version:major": "exr version major --manifest ./public/manifest.prod.json",
 		"pack": "npm run build && exr pack dist/",
 		"release": "exr release dist/ --force"
 	},
