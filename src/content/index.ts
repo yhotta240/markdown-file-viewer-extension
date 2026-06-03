@@ -1,5 +1,113 @@
-import { logInfo } from "../utils/logger";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./style.css";
 
-console.log("content script");
+import { isEnabled } from "../utils/storage";
+import { buildControlPanel } from "./panel";
+import { getMarkdownText, hideRawContent, renderPreview, setFavicon } from "./preview";
+import { buildTOC } from "./toc";
 
-logInfo(`ページ読み込み: ${document.title || location.pathname}`, "content");
+// チラつき防止（FOUC対策）の即時実行処理
+(function preventFlash() {
+  try {
+    // 画面全体を一時的に隠す
+    document.documentElement.style.opacity = "0";
+    document.documentElement.style.transition = "none";
+
+    // ストレージロード前にOS設定に合わせたテーマを仮当てして、背景色のチラつきを防ぐ
+    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.setAttribute("data-bs-theme", isDark ? "dark" : "light");
+  } catch (err) {
+    console.error("Markdown View: preventFlash failed", err);
+  }
+})();
+
+async function init() {
+  const enabled = await isEnabled();
+  if (!enabled) {
+    // 無効な場合は画面の非表示を解除して、ブラウザデフォルト表示に戻す
+    document.documentElement.style.opacity = "";
+    setTimeout(() => {
+      document.documentElement.style.transition = "";
+    }, 50);
+    return;
+  }
+
+  const markdownText = getMarkdownText();
+  if (!markdownText) {
+    console.log("Markdown View: No markdown content found.");
+    document.documentElement.style.opacity = "";
+    setTimeout(() => {
+      document.documentElement.style.transition = "";
+    }, 50);
+    return;
+  }
+
+  // タブのファビコンを拡張機能のアイコンに差し替える
+  setFavicon();
+
+  // プレビュー用のルートコンテナを作成
+  const appRoot = document.createElement("div");
+  appRoot.id = "mv-app-root";
+  document.body.appendChild(appRoot);
+
+  // プレビュー表示用のメイン領域 (Bootstrapコンテナ)
+  const containerWrapper = document.createElement("div");
+  containerWrapper.className = "mv-container";
+  appRoot.appendChild(containerWrapper);
+
+  // プレビューのレンダリング (内部にプレビューとソースの両方の領域が生成されます)
+  const previewArea = await renderPreview(markdownText);
+  containerWrapper.appendChild(previewArea);
+
+  // 目次 (TOC) の自動生成と構築
+  buildTOC(previewArea, appRoot);
+
+  // 表示モード (プレビュー / ソースコード) の切り替え処理
+  const onViewModeChange = (mode: "preview" | "source") => {
+    const previewRender = document.getElementById("mv-preview-render");
+    const sourceRender = document.getElementById("mv-source-render");
+    const tocWrapper = document.getElementById("mv-toc-wrapper");
+
+    if (previewRender && sourceRender) {
+      if (mode === "source") {
+        previewRender.style.display = "none";
+        sourceRender.style.display = "block";
+        if (tocWrapper) {
+          tocWrapper.style.display = "none";
+        }
+      } else {
+        sourceRender.style.display = "none";
+        previewRender.style.display = "block";
+        if (tocWrapper) {
+          tocWrapper.style.display = "";
+          // 表示を戻したあとに配置スペースの再計算をトリガーする
+          window.dispatchEvent(new Event("resize"));
+        }
+      }
+    }
+  };
+
+  // コントロールパネル (Offcanvas設定画面、および統合ツールバー) の構築
+  buildControlPanel(appRoot, previewArea, markdownText, onViewModeChange);
+
+  // 初期状態ではブラウザデフォルトの生ソースを非表示にする
+  hideRawContent();
+
+  // 設定の適用完了後に非表示を解除し、フェードインさせる
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.documentElement.style.opacity = "";
+      setTimeout(() => {
+        document.documentElement.style.transition = "";
+      }, 50);
+    });
+  });
+}
+
+// 実行
+init().catch((err) => {
+  console.error("Markdown View initialization failed:", err);
+  // エラー時も非表示状態を確実に解除
+  document.documentElement.style.opacity = "";
+  document.documentElement.style.transition = "";
+});
