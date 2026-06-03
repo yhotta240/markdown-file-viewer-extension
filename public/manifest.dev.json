@@ -1,24 +1,37 @@
 {
   "manifest_version": 3,
-  "name": "Chrome Extension Starter Kit",
-  "short_name": "Chrome Extension Starter Kit",
-  "version": "0.2.0",
-  "description": "",
+  "name": "Markdown File Viewer Extension",
+  "short_name": "Markdown File Viewer",
+  "version": "0.0.1",
+  "description": "ローカルおよび Web 上の Markdown ファイルを表示するシンプルなビューアー",
   "icons": {
     "48": "icons/icon.png"
   },
-  "permissions": ["storage", "tabs"],
-  "action": {
-    "default_popup": "popup.html"
-  },
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "action": {},
+  "host_permissions": [
+    "https://*/*.md",
+    "https://*/*.markdown",
+    "file:///*/*.md",
+    "file:///*/*.markdown"
+  ],
   "background": {
-    "service_worker": "background.js",
-    "type": "module"
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["https://*/*", "http://*/*"],
-      "js": ["content.js"]
+      "matches": [
+        "https://*/*.md",
+        "https://*/*.markdown",
+        "file:///*/*.md",
+        "file:///*/*.markdown"
+      ],
+      "js": [
+        "content.js"
+      ]
     }
   ]
 }
