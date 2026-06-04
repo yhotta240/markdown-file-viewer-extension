@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Markdown File Viewer Extension",
   "short_name": "Markdown File Viewer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "ローカルおよび Web 上の Markdown ファイルを表示するシンプルなビューアー",
   "icons": {
     "48": "icons/icon.png"
