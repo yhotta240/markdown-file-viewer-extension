@@ -7,6 +7,13 @@ export type Settings = {
   customFg?: string;
   customBg?: string;
   maxWidth?: number;
+  // Text-to-Speech settings
+  ttsEnabled?: boolean;
+  ttsVoice?: string;
+  ttsRate?: number;
+  ttsPitch?: number;
+  ttsVolume?: number;
+  autoReadOnLoad?: boolean;
 };
 
 export const DEFAULT_SETTINGS: Required<Settings> = {
@@ -18,4 +25,10 @@ export const DEFAULT_SETTINGS: Required<Settings> = {
   customFg: "#191b1f",
   customBg: "#ffffff",
   maxWidth: 860,
+  ttsEnabled: false,
+  ttsVoice: "",
+  ttsRate: 1.0,
+  ttsPitch: 1.0,
+  ttsVolume: 1.0,
+  autoReadOnLoad: false,
 };

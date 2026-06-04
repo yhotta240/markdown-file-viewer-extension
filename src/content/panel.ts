@@ -6,6 +6,15 @@ import { escapeHtml } from "../utils/html";
 import { clearLogs, getLogs } from "../utils/logger";
 import { getSettings, setSettings } from "../utils/storage";
 import { exportMarkdown, exportPdf, exportRawHtml, exportStyledHtml } from "./export";
+import {
+  getVoices,
+  isSpeaking,
+  speak,
+  pause as ttsPause,
+  isPaused as ttsPaused,
+  resume as ttsResume,
+  stop as ttsStop,
+} from "./tts";
 
 // SVGアイコン定数
 const ICON_EYE_FILL = `
@@ -32,6 +41,24 @@ const ICON_EXPORT = `
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
     <path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1z"/>
     <path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 1.707V10.5a.5.5 0 0 1-1 0V1.707L5.354 3.854a.5.5 0 1 1-.708-.708z"/>
+  </svg>
+`;
+
+const ICON_PLAY = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M10.804 8 5 11.196V4.804L10.804 8z"/>
+  </svg>
+`;
+
+const ICON_PAUSE = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M5.5 3.5h1.5v9H5.5v-9zM9 3.5h1.5v9H9v-9z"/>
+  </svg>
+`;
+
+const ICON_STOP_SVG = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M5 5h6v6H5z"/>
   </svg>
 `;
 
@@ -152,6 +179,16 @@ export function buildControlPanel(
     <!-- 印刷 -->
     <button type="button" class="mv-toolbar-btn" id="mv-print-button" title="印刷する (P)">
       ${ICON_PRINTER}
+    </button>
+    
+    <div class="mv-toolbar-divider"></div>
+
+    <!-- 読み上げ -->
+    <button type="button" class="mv-toolbar-btn" id="mv-tts-button" title="読み上げ (R)">
+      ${ICON_PLAY}
+    </button>
+    <button type="button" class="mv-toolbar-btn" id="mv-tts-stop-button" title="停止" style="display: none;">
+      ${ICON_STOP_SVG}
     </button>
     
     <div class="mv-toolbar-divider"></div>
@@ -304,6 +341,48 @@ export function buildControlPanel(
         <div class="form-check form-switch mt-3">
           <input class="form-check-input" type="checkbox" role="switch" id="mv-settings-notifications" checked>
           <label class="form-check-label small fw-medium text-secondary" for="mv-settings-notifications">通知を有効にする</label>
+        </div>
+      </div>
+
+      <hr class="my-4 text-muted">
+
+      <!-- 1.5. 読み上げ設定 -->
+      <div class="mb-4">
+        <h6 class="fw-bold mb-3 small text-uppercase tracking-wider text-muted">読み上げ設定</h6>
+
+        <!-- ボイス選択 -->
+        <div class="mb-3">
+          <label for="mv-tts-voice-select" class="form-label small fw-semibold text-secondary mb-2">ボイス</label>
+          <select class="form-select form-select-sm" id="mv-tts-voice-select">
+            <option value="">システム標準</option>
+          </select>
+        </div>
+
+        <!-- 速度 -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-2">
+            <label for="mv-tts-rate-slider" class="form-label small fw-semibold text-secondary mb-0">速度</label>
+            <span class="badge bg-secondary-subtle text-secondary-emphasis" id="mv-tts-rate-badge">1.0x</span>
+          </div>
+          <input type="range" class="form-range" min="0.5" max="2.0" step="0.1" id="mv-tts-rate-slider" value="1.0">
+        </div>
+
+        <!-- ピッチ -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-2">
+            <label for="mv-tts-pitch-slider" class="form-label small fw-semibold text-secondary mb-0">ピッチ</label>
+            <span class="badge bg-secondary-subtle text-secondary-emphasis" id="mv-tts-pitch-badge">1.0</span>
+          </div>
+          <input type="range" class="form-range" min="0" max="2" step="0.1" id="mv-tts-pitch-slider" value="1.0">
+        </div>
+
+        <!-- 音量 -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-2">
+            <label for="mv-tts-volume-slider" class="form-label small fw-semibold text-secondary mb-0">音量</label>
+            <span class="badge bg-secondary-subtle text-secondary-emphasis" id="mv-tts-volume-badge">100%</span>
+          </div>
+          <input type="range" class="form-range" min="0" max="1" step="0.05" id="mv-tts-volume-slider" value="1.0">
         </div>
       </div>
 
@@ -602,6 +681,28 @@ function setupPanelEvents(
   const maxWidthSlider = offcanvas.querySelector("#mv-max-width-slider") as HTMLInputElement;
   const maxWidthBadge = offcanvas.querySelector("#mv-max-width-badge") as HTMLElement;
 
+  // TTS 設定関連
+  const ttsVoiceSelect = offcanvas.querySelector("#mv-tts-voice-select") as HTMLSelectElement;
+  const ttsRateSlider = offcanvas.querySelector("#mv-tts-rate-slider") as HTMLInputElement;
+  const ttsRateBadge = offcanvas.querySelector("#mv-tts-rate-badge") as HTMLElement;
+  const ttsPitchSlider = offcanvas.querySelector("#mv-tts-pitch-slider") as HTMLInputElement;
+  const ttsPitchBadge = offcanvas.querySelector("#mv-tts-pitch-badge") as HTMLElement;
+  const ttsVolumeSlider = offcanvas.querySelector("#mv-tts-volume-slider") as HTMLInputElement;
+  const ttsVolumeBadge = offcanvas.querySelector("#mv-tts-volume-badge") as HTMLElement;
+
+  // ボイス一覧を非同期で取得してセレクタを埋める
+  getVoices().then((voices) => {
+    const currentVoice = ttsVoiceSelect.value;
+    while (ttsVoiceSelect.options.length > 1) ttsVoiceSelect.remove(1);
+    for (const v of voices) {
+      const opt = document.createElement("option");
+      opt.value = v.name;
+      opt.textContent = `${v.name} (${v.lang})`;
+      ttsVoiceSelect.appendChild(opt);
+    }
+    ttsVoiceSelect.value = currentVoice;
+  });
+
   let currentSettings: Required<Settings> = { ...DEFAULT_SETTINGS };
 
   // 設定を DOM とプレビュー画面に適用する
@@ -703,6 +804,20 @@ function setupPanelEvents(
     if (settings.notifications !== undefined) {
       notifyCheckbox.checked = settings.notifications;
     }
+
+    // 7. TTS 設定の適用
+    ttsRateSlider.value = String(settings.ttsRate);
+    ttsRateBadge.textContent = `${settings.ttsRate.toFixed(1)}x`;
+    ttsPitchSlider.value = String(settings.ttsPitch);
+    ttsPitchBadge.textContent = settings.ttsPitch.toFixed(1);
+    ttsVolumeSlider.value = String(settings.ttsVolume);
+    ttsVolumeBadge.textContent = `${Math.round(settings.ttsVolume * 100)}%`;
+    if (
+      settings.ttsVoice &&
+      ttsVoiceSelect.querySelector(`option[value="${CSS.escape(settings.ttsVoice)}"]`)
+    ) {
+      ttsVoiceSelect.value = settings.ttsVoice;
+    }
   };
 
   // OSテーマ設定変更時の追従
@@ -729,6 +844,104 @@ function setupPanelEvents(
     await setSettings(currentSettings);
   };
 
+  // TTS ボタン参照とイベント
+  const ttsBtn = toolbar.querySelector("#mv-tts-button") as HTMLElement | null;
+  const ttsStopBtn = toolbar.querySelector("#mv-tts-stop-button") as HTMLElement | null;
+
+  const clearTtsMonitor = () => {
+    if (ttsMonitor !== null) {
+      clearInterval(ttsMonitor);
+      ttsMonitor = null;
+    }
+  };
+
+  const updateTtsButtonUI = () => {
+    if (!ttsBtn || !ttsStopBtn) return;
+    const speaking = isSpeaking();
+    const paused = ttsPaused();
+    if (speaking) {
+      ttsBtn.innerHTML = ICON_PAUSE;
+      ttsBtn.setAttribute("title", "一時停止 (R)");
+      ttsStopBtn.style.display = "inline-flex";
+    } else if (paused) {
+      ttsBtn.innerHTML = ICON_PLAY;
+      ttsBtn.setAttribute("title", "再開 (R)");
+      ttsStopBtn.style.display = "inline-flex";
+    } else {
+      ttsBtn.innerHTML = ICON_PLAY;
+      ttsBtn.setAttribute("title", "読み上げ (R)");
+      ttsStopBtn.style.display = "none";
+    }
+  };
+
+  let ttsMonitor: number | null = null;
+
+  const startTtsPlayback = async () => {
+    const previewRender = document.getElementById("mv-preview-render");
+    const text = previewRender?.innerText ? previewRender.innerText : markdownText;
+
+    let voice: SpeechSynthesisVoice | undefined;
+    if (currentSettings.ttsVoice) {
+      const voices = await getVoices();
+      voice = voices.find((v) => v.name === currentSettings.ttsVoice);
+    }
+
+    speak(
+      text,
+      {
+        voice: voice ?? null,
+        rate: currentSettings.ttsRate,
+        pitch: currentSettings.ttsPitch,
+        volume: currentSettings.ttsVolume,
+      },
+      () => {
+        clearTtsMonitor();
+        updateTtsButtonUI();
+      },
+    );
+
+    updateTtsButtonUI();
+    if (ttsMonitor === null) {
+      ttsMonitor = window.setInterval(updateTtsButtonUI, 400);
+    }
+  };
+
+  if (ttsBtn) {
+    ttsBtn.addEventListener("click", async () => {
+      try {
+        if (isSpeaking()) {
+          ttsPause();
+          clearTtsMonitor();
+          updateTtsButtonUI();
+          return;
+        }
+        if (ttsPaused()) {
+          ttsResume();
+          updateTtsButtonUI();
+          if (ttsMonitor === null) {
+            ttsMonitor = window.setInterval(updateTtsButtonUI, 400);
+          }
+          return;
+        }
+        await startTtsPlayback();
+      } catch (err) {
+        console.error("TTS play failed", err);
+      }
+    });
+  }
+
+  if (ttsStopBtn) {
+    ttsStopBtn.addEventListener("click", () => {
+      try {
+        ttsStop();
+        clearTtsMonitor();
+        updateTtsButtonUI();
+      } catch (err) {
+        console.error("TTS stop failed", err);
+      }
+    });
+  }
+
   // 表示モード変更イベント
   toggleViewBtn.addEventListener("click", () => {
     const nextMode = currentSettings.viewMode === "preview" ? "source" : "preview";
@@ -741,6 +954,28 @@ function setupPanelEvents(
       if (e.key === "s" || e.key === "S") {
         const nextMode = currentSettings.viewMode === "preview" ? "source" : "preview";
         saveAndApply({ viewMode: nextMode });
+      } else if (e.key === "r" || e.key === "R") {
+        (async () => {
+          try {
+            if (isSpeaking()) {
+              ttsPause();
+              clearTtsMonitor();
+              updateTtsButtonUI();
+              return;
+            }
+            if (ttsPaused()) {
+              ttsResume();
+              updateTtsButtonUI();
+              if (ttsMonitor === null) {
+                ttsMonitor = window.setInterval(updateTtsButtonUI, 400);
+              }
+              return;
+            }
+            await startTtsPlayback();
+          } catch (err) {
+            console.error("TTS shortcut failed", err);
+          }
+        })();
       }
     }
   });
@@ -831,6 +1066,58 @@ function setupPanelEvents(
   notifyCheckbox.addEventListener("change", (e) => {
     const checked = (e.target as HTMLInputElement).checked;
     saveAndApply({ notifications: checked });
+  });
+
+  // TTS ボイス変更
+  ttsVoiceSelect.addEventListener("change", async (e) => {
+    if (isSpeaking() || ttsPaused()) {
+      ttsStop();
+      clearTtsMonitor();
+    }
+    await saveAndApply({ ttsVoice: (e.target as HTMLSelectElement).value });
+    updateTtsButtonUI();
+  });
+
+  // TTS 速度変更中
+  ttsRateSlider.addEventListener("input", (e) => {
+    const val = Number((e.target as HTMLInputElement).value);
+    ttsRateBadge.textContent = `${val.toFixed(1)}x`;
+  });
+  ttsRateSlider.addEventListener("change", async (e) => {
+    if (isSpeaking() || ttsPaused()) {
+      ttsStop();
+      clearTtsMonitor();
+    }
+    await saveAndApply({ ttsRate: Number((e.target as HTMLInputElement).value) });
+    updateTtsButtonUI();
+  });
+
+  // TTS ピッチ変更中
+  ttsPitchSlider.addEventListener("input", (e) => {
+    const val = Number((e.target as HTMLInputElement).value);
+    ttsPitchBadge.textContent = val.toFixed(1);
+  });
+  ttsPitchSlider.addEventListener("change", async (e) => {
+    if (isSpeaking() || ttsPaused()) {
+      ttsStop();
+      clearTtsMonitor();
+    }
+    await saveAndApply({ ttsPitch: Number((e.target as HTMLInputElement).value) });
+    updateTtsButtonUI();
+  });
+
+  // TTS 音量変更中
+  ttsVolumeSlider.addEventListener("input", (e) => {
+    const val = Number((e.target as HTMLInputElement).value);
+    ttsVolumeBadge.textContent = `${Math.round(val * 100)}%`;
+  });
+  ttsVolumeSlider.addEventListener("change", async (e) => {
+    if (isSpeaking() || ttsPaused()) {
+      ttsStop();
+      clearTtsMonitor();
+    }
+    await saveAndApply({ ttsVolume: Number((e.target as HTMLInputElement).value) });
+    updateTtsButtonUI();
   });
 
   // 設定リセットボタン (カラーテーマ等の影響を受けない)
