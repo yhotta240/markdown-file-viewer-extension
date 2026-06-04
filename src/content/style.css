@@ -299,7 +299,8 @@ body {
    ミニインジケーターモード (短い横棒の縦並び)
    -------------------------------------------------------------------------- */
 #mv-toc-wrapper.mv-toc-minimized {
-  width: 30px;
+  width: 56px;
+  padding-left: 26px;
 }
 
 #mv-toc-wrapper.mv-toc-minimized ul {
@@ -316,11 +317,23 @@ body {
   position: relative;
   display: flex;
   align-items: center;
-  height: 16px;
+  height: 20px;
 }
 
-/* ナビゲーション用の横棒 (大きめに) */
+/* <a> 全体をクリック領域にし、::before で視覚バーを描画 */
 #mv-toc-wrapper.mv-toc-minimized .mv-toc-link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 30px;
+  height: 20px;
+  background: none;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#mv-toc-wrapper.mv-toc-minimized .mv-toc-link::before {
+  content: "";
   display: block;
   height: 4px;
   width: 18px;
@@ -330,7 +343,6 @@ body {
     width 0.2s cubic-bezier(0.16, 1, 0.3, 1),
     height 0.2s ease,
     background-color 0.2s ease;
-  text-decoration: none;
 }
 
 #mv-toc-wrapper.mv-toc-minimized .mv-toc-link span {
@@ -338,14 +350,14 @@ body {
 }
 
 /* ホバー時の横棒の拡大 */
-#mv-toc-wrapper.mv-toc-minimized .mv-toc-item:hover .mv-toc-link {
+#mv-toc-wrapper.mv-toc-minimized .mv-toc-item:hover .mv-toc-link::before {
   width: 28px;
   background-color: var(--bs-body-color);
   height: 5px;
 }
 
 /* 現在位置のアクティブ強調表示 */
-#mv-toc-wrapper.mv-toc-minimized .mv-toc-item.active .mv-toc-link {
+#mv-toc-wrapper.mv-toc-minimized .mv-toc-item.active .mv-toc-link::before {
   width: 30px;
   background-color: var(--mv-btn-bg);
   height: 6px;
@@ -363,19 +375,20 @@ body {
   max-width: 280px;
   max-height: 60vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
   opacity: 0;
   pointer-events: none;
   transition:
     opacity 0.15s ease,
     transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-  transform: translateX(8px);
+  transform: translate(8px, -50%);
 }
 
 .mv-toc-mini-popup.visible {
   opacity: 1;
   pointer-events: auto;
-  transform: translateX(0);
+  transform: translate(0, -50%);
 }
 
 .mv-toc-mini-popup-item {
@@ -384,8 +397,8 @@ body {
   text-align: left;
   border: none;
   background: none;
-  padding: 0.35rem 1rem;
-  font-size: 0.82rem;
+  padding: 0.18rem 0.75rem;
+  font-size: 0.78rem;
   color: var(--bs-secondary-color);
   text-decoration: none;
   cursor: pointer;
@@ -395,7 +408,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.4;
+  line-height: 1.3;
 }
 
 .mv-toc-mini-popup-item:hover {
@@ -410,26 +423,25 @@ body {
 
 /* インデント */
 .mv-toc-mini-popup-item[data-depth="h1"] {
-  padding-left: 1rem;
+  padding-left: 0.75rem;
 }
 .mv-toc-mini-popup-item[data-depth="h2"] {
-  padding-left: 1.6rem;
+  padding-left: 1.25rem;
 }
 .mv-toc-mini-popup-item[data-depth="h3"] {
-  padding-left: 2.2rem;
-  font-size: 0.78rem;
+  padding-left: 1.75rem;
 }
 .mv-toc-mini-popup-item[data-depth="h4"] {
-  padding-left: 2.8rem;
-  font-size: 0.76rem;
+  padding-left: 2.25rem;
+  font-size: 0.74rem;
 }
 .mv-toc-mini-popup-item[data-depth="h5"] {
-  padding-left: 3.4rem;
-  font-size: 0.74rem;
+  padding-left: 2.75rem;
+  font-size: 0.72rem;
 }
 .mv-toc-mini-popup-item[data-depth="h6"] {
-  padding-left: 4rem;
-  font-size: 0.74rem;
+  padding-left: 3.25rem;
+  font-size: 0.72rem;
 }
 
 /* ==========================================================================
