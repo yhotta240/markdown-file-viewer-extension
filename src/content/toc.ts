@@ -47,10 +47,13 @@ function updateTocResponsive(tocWrapper: HTMLElement, popup: HTMLElement): void 
     tocWrapper.style.transform = "";
     popup.classList.remove("visible");
   } else {
-    const indicatorLeft = Math.min(containerRect.left + containerRect.width + 8, windowWidth - 38);
-    tocWrapper.style.left = `${Math.max(0, indicatorLeft)}px`;
-    tocWrapper.style.top = "50%";
-    tocWrapper.style.transform = "translateY(-50%)";
+    const wrapperW = 56; // CSS #mv-toc-wrapper.mv-toc-minimized の width と合わせる
+    const margin = 10;
+    // コンテナ右端の外側に置けるスペースがあればその位置、なければコンテナ右端に重ねる
+    const idealLeft = containerRect.left + containerRect.width + 8;
+    const clampedLeft = Math.min(idealLeft, windowWidth - wrapperW - margin);
+    tocWrapper.style.left = `${Math.max(margin, clampedLeft)}px`;
+    // top は updateLayout で合計高さ確定後に設定する
   }
 }
 
@@ -156,7 +159,7 @@ export function buildTOC(previewArea: HTMLElement, appRoot: HTMLElement): void {
       window.innerHeight - margin - popupH / 2,
     );
     popup.style.top = `${clampedTop}px`;
-    popup.style.right = `${window.innerWidth - rect.left + 8}px`;
+    popup.style.right = `${window.innerWidth - rect.left - 10}px`;
 
     popup.classList.add("visible");
 
@@ -194,15 +197,22 @@ export function buildTOC(previewArea: HTMLElement, appRoot: HTMLElement): void {
     // ミニモード時: バーの高さと gap を動的計算してはみ出しを防ぐ
     const n = tocItems.length;
     if (tocWrapper.classList.contains("mv-toc-minimized") && n > 0) {
-      const availH = window.innerHeight * 0.72;
-      const itemH = Math.max(8, Math.min(20, Math.floor(availH / n)));
-      const gapPx = Math.max(0, Math.min(6, Math.floor((availH - n * itemH) / Math.max(1, n - 1))));
+      const margin = 8;
+      // 70% を上限としつつ、itemH を floor で切り捨てるので totalH は必ず上限内に収まる
+      const availH = window.innerHeight * 0.7;
+      const itemH = Math.max(2, Math.min(20, Math.floor(availH / n)));
+      const gapPx =
+        n > 1 ? Math.max(0, Math.min(6, Math.floor((availH - n * itemH) / (n - 1)))) : 0;
       ul.style.gap = `${gapPx}px`;
       for (const li of tocItems) {
         li.style.height = `${itemH}px`;
         const a = li.querySelector("a") as HTMLElement | null;
         if (a) a.style.height = `${itemH}px`;
       }
+      const totalH = n * itemH + (n > 1 ? (n - 1) * gapPx : 0);
+      const idealTop = (window.innerHeight - totalH) / 2;
+      tocWrapper.style.top = `${Math.min(Math.max(margin, idealTop), window.innerHeight - totalH - margin)}px`;
+      tocWrapper.style.transform = "";
     } else {
       ul.style.gap = "";
       for (const li of tocItems) {
