@@ -556,6 +556,17 @@ body {
   flex-shrink: 0;
 }
 
+/* 読み上げ中の単語ハイライト（CSS Custom Highlight API） */
+::highlight(mv-tts-word) {
+  background-color: #ffe066;
+  color: inherit;
+}
+
+[data-bs-theme="dark"] ::highlight(mv-tts-word) {
+  background-color: #b38600;
+  color: #fff;
+}
+
 /* 印刷用スタイル */
 @media print {
   body {

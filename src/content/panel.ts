@@ -848,13 +848,6 @@ function setupPanelEvents(
   const ttsBtn = toolbar.querySelector("#mv-tts-button") as HTMLElement | null;
   const ttsStopBtn = toolbar.querySelector("#mv-tts-stop-button") as HTMLElement | null;
 
-  const clearTtsMonitor = () => {
-    if (ttsMonitor !== null) {
-      clearInterval(ttsMonitor);
-      ttsMonitor = null;
-    }
-  };
-
   const updateTtsButtonUI = () => {
     if (!ttsBtn || !ttsStopBtn) return;
     const speaking = isSpeaking();
@@ -874,11 +867,91 @@ function setupPanelEvents(
     }
   };
 
-  let ttsMonitor: number | null = null;
+  // DOM テキストノードと開始位置のマッピングを構築する
+  const buildTtsMap = (
+    root: HTMLElement,
+  ): { text: string; segments: Array<{ node: Text; start: number }> } => {
+    const segments: Array<{ node: Text; start: number }> = [];
+    let text = "";
+    const BLOCK_TAGS = new Set([
+      "P",
+      "H1",
+      "H2",
+      "H3",
+      "H4",
+      "H5",
+      "H6",
+      "LI",
+      "BLOCKQUOTE",
+      "PRE",
+      "TD",
+      "TH",
+      "DT",
+      "DD",
+    ]);
+    const walk = (node: Node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const content = node.textContent ?? "";
+        if (content.length > 0) {
+          segments.push({ node: node as Text, start: text.length });
+          text += content;
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const tag = (node as Element).tagName;
+        if (BLOCK_TAGS.has(tag) && text.length > 0 && !text.endsWith(" ")) text += " ";
+        for (const child of Array.from(node.childNodes)) walk(child);
+      }
+    };
+    walk(root);
+    return { text, segments };
+  };
+
+  // CSS Custom Highlight API で読み上げ中の単語ハイライトを除去する
+  const clearTtsHighlight = () => {
+    CSS.highlights?.delete("mv-tts-word");
+  };
+
+  // charIndex/charLength の位置に CSS Custom Highlight API でハイライトを適用する
+  // DOM を変更しないため segments の参照が壊れず、スクロールしても追従する
+  const highlightTtsWord = (
+    segments: Array<{ node: Text; start: number }>,
+    charIndex: number,
+    charLength: number,
+  ) => {
+    clearTtsHighlight();
+    let seg: { node: Text; start: number } | undefined;
+    for (let i = segments.length - 1; i >= 0; i--) {
+      if (segments[i].start <= charIndex) {
+        seg = segments[i];
+        break;
+      }
+    }
+    if (!seg) return;
+    const nodeText = seg.node.textContent ?? "";
+    const nodeStart = charIndex - seg.start;
+    if (nodeStart >= nodeText.length) return;
+    const nodeEnd = Math.min(nodeStart + (charLength || 1), nodeText.length);
+    try {
+      const range = document.createRange();
+      range.setStart(seg.node, nodeStart);
+      range.setEnd(seg.node, nodeEnd);
+      CSS.highlights?.set("mv-tts-word", new Highlight(range));
+      // ビューポート外のときだけスクロール
+      const rect = range.getBoundingClientRect();
+      if (rect.top < 0 || rect.bottom > window.innerHeight) {
+        seg.node.parentElement?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    } catch {
+      // Range 生成に失敗した場合はスキップ
+    }
+  };
 
   const startTtsPlayback = async () => {
     const previewRender = document.getElementById("mv-preview-render");
-    const text = previewRender?.innerText ? previewRender.innerText : markdownText;
+    // DOM テキストマップを構築し、ハイライトに使用する
+    const { text: ttsText, segments: ttsSegments } = previewRender
+      ? buildTtsMap(previewRender)
+      : { text: markdownText, segments: [] };
 
     let voice: SpeechSynthesisVoice | undefined;
     if (currentSettings.ttsVoice) {
@@ -887,7 +960,7 @@ function setupPanelEvents(
     }
 
     speak(
-      text,
+      ttsText,
       {
         voice: voice ?? null,
         rate: currentSettings.ttsRate,
@@ -895,15 +968,15 @@ function setupPanelEvents(
         volume: currentSettings.ttsVolume,
       },
       () => {
-        clearTtsMonitor();
+        clearTtsHighlight();
         updateTtsButtonUI();
+      },
+      (charIndex, charLength) => {
+        highlightTtsWord(ttsSegments, charIndex, charLength);
       },
     );
 
     updateTtsButtonUI();
-    if (ttsMonitor === null) {
-      ttsMonitor = window.setInterval(updateTtsButtonUI, 400);
-    }
   };
 
   if (ttsBtn) {
@@ -911,16 +984,12 @@ function setupPanelEvents(
       try {
         if (isSpeaking()) {
           ttsPause();
-          clearTtsMonitor();
           updateTtsButtonUI();
           return;
         }
         if (ttsPaused()) {
           ttsResume();
           updateTtsButtonUI();
-          if (ttsMonitor === null) {
-            ttsMonitor = window.setInterval(updateTtsButtonUI, 400);
-          }
           return;
         }
         await startTtsPlayback();
@@ -934,7 +1003,7 @@ function setupPanelEvents(
     ttsStopBtn.addEventListener("click", () => {
       try {
         ttsStop();
-        clearTtsMonitor();
+        clearTtsHighlight();
         updateTtsButtonUI();
       } catch (err) {
         console.error("TTS stop failed", err);
@@ -959,16 +1028,12 @@ function setupPanelEvents(
           try {
             if (isSpeaking()) {
               ttsPause();
-              clearTtsMonitor();
               updateTtsButtonUI();
               return;
             }
             if (ttsPaused()) {
               ttsResume();
               updateTtsButtonUI();
-              if (ttsMonitor === null) {
-                ttsMonitor = window.setInterval(updateTtsButtonUI, 400);
-              }
               return;
             }
             await startTtsPlayback();
@@ -1070,10 +1135,7 @@ function setupPanelEvents(
 
   // TTS ボイス変更
   ttsVoiceSelect.addEventListener("change", async (e) => {
-    if (isSpeaking() || ttsPaused()) {
-      ttsStop();
-      clearTtsMonitor();
-    }
+    if (isSpeaking() || ttsPaused()) ttsStop();
     await saveAndApply({ ttsVoice: (e.target as HTMLSelectElement).value });
     updateTtsButtonUI();
   });
@@ -1084,10 +1146,7 @@ function setupPanelEvents(
     ttsRateBadge.textContent = `${val.toFixed(1)}x`;
   });
   ttsRateSlider.addEventListener("change", async (e) => {
-    if (isSpeaking() || ttsPaused()) {
-      ttsStop();
-      clearTtsMonitor();
-    }
+    if (isSpeaking() || ttsPaused()) ttsStop();
     await saveAndApply({ ttsRate: Number((e.target as HTMLInputElement).value) });
     updateTtsButtonUI();
   });
@@ -1098,10 +1157,7 @@ function setupPanelEvents(
     ttsPitchBadge.textContent = val.toFixed(1);
   });
   ttsPitchSlider.addEventListener("change", async (e) => {
-    if (isSpeaking() || ttsPaused()) {
-      ttsStop();
-      clearTtsMonitor();
-    }
+    if (isSpeaking() || ttsPaused()) ttsStop();
     await saveAndApply({ ttsPitch: Number((e.target as HTMLInputElement).value) });
     updateTtsButtonUI();
   });
@@ -1112,10 +1168,7 @@ function setupPanelEvents(
     ttsVolumeBadge.textContent = `${Math.round(val * 100)}%`;
   });
   ttsVolumeSlider.addEventListener("change", async (e) => {
-    if (isSpeaking() || ttsPaused()) {
-      ttsStop();
-      clearTtsMonitor();
-    }
+    if (isSpeaking() || ttsPaused()) ttsStop();
     await saveAndApply({ ttsVolume: Number((e.target as HTMLInputElement).value) });
     updateTtsButtonUI();
   });
