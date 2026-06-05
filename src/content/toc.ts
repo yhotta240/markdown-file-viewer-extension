@@ -19,7 +19,7 @@ function setupTocObserver(headings: HTMLElement[], tocItems: HTMLElement[]): voi
         item.classList.toggle("active", href === `#${activeId}`);
       }
     },
-    { rootMargin: "0px 0px -60% 0px", threshold: 0 },
+    { rootMargin: "0px 0px -10% 0px", threshold: 0 },
   );
 
   for (const heading of headings) observer.observe(heading);
