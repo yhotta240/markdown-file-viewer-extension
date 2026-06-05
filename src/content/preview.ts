@@ -184,12 +184,7 @@ function addCopyButtonsToCodeBlocks(root: HTMLElement): void {
     btn.className = "mv-code-copy-btn";
     btn.type = "button";
     btn.title = "コピー";
-    btn.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M5 1a2 2 0 0 0-2 2v1H2a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H5zM4 2h8a1 1 0 0 1 1 1v1H3V3a1 1 0 0 1 1-1z"/>
-        <path d="M9 6a1 1 0 0 1 1 1v6H3a1 1 0 0 1-1-1V6h7z"/>
-      </svg>
-    `;
+    btn.innerHTML = `<i class="bi bi-copy"></i>`;
 
     // クリックでコードテキストをコピー
     btn.addEventListener("click", async (e) => {
@@ -198,18 +193,13 @@ function addCopyButtonsToCodeBlocks(root: HTMLElement): void {
       const text = code ? code.textContent || "" : pre.textContent || "";
       try {
         await navigator.clipboard.writeText(text);
-        const prev = btn.innerHTML;
         const prevColor = btn.style.color || "";
         // 大きめのチェックアイコンを一時表示して色を緑にする
-        btn.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" style="width:14px;height:14px;display:block;" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M13.485 1.929a1.5 1.5 0 0 1 0 2.121L6.25 11.286l-3-3a1 1 0 1 1 1.414-1.414l1.586 1.586 6.915-6.915a1.5 1.5 0 0 1 2.12 0z"/>
-          </svg>
-        `;
+        btn.innerHTML = `<i class="bi bi-check-lg" style="font-size:14px;"></i>`;
         btn.title = "コピーしました";
         btn.style.color = "#16a34a";
         setTimeout(() => {
-          btn.innerHTML = prev;
+          btn.innerHTML = `<i class="bi bi-copy"></i>`;
           btn.title = "コピー";
           btn.style.color = prevColor;
         }, 1600);

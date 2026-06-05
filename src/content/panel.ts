@@ -16,51 +16,33 @@ import {
   stop as ttsStop,
 } from "./tts";
 
-// SVGアイコン定数
-const ICON_EYE_FILL = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
-    <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
-  </svg>
-`;
+const ICON_EYE_FILL = `<i class="bi bi-eye-fill"></i>`;
 
-const ICON_CODE_SLASH = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0m6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0"/>
-  </svg>
-`;
+const ICON_CLIPBOARD = `<i class="bi bi-clipboard"></i>`;
 
-const ICON_PRINTER = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
-    <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1"/>
-  </svg>
-`;
+const ICON_CLIPBOARD_CHECK = `<i class="bi bi-clipboard-check-fill text-success"></i>`;
 
-const ICON_EXPORT = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-    <path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1z"/>
-    <path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 1.707V10.5a.5.5 0 0 1-1 0V1.707L5.354 3.854a.5.5 0 1 1-.708-.708z"/>
-  </svg>
-`;
+const ICON_CODE_SLASH = `<i class="bi bi-code-slash"></i>`;
 
-const ICON_PLAY = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M10.804 8 5 11.196V4.804L10.804 8z"/>
-  </svg>
-`;
+const ICON_PRINTER = `<i class="bi bi-printer"></i>`;
 
-const ICON_PAUSE = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M5.5 3.5h1.5v9H5.5v-9zM9 3.5h1.5v9H9v-9z"/>
-  </svg>
-`;
+const ICON_EXPORT = `<i class="bi bi-box-arrow-up"></i>`;
 
-const ICON_STOP_SVG = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M5 5h6v6H5z"/>
-  </svg>
-`;
+const ICON_PLAY = `<i class="bi bi-play-fill"></i>`;
+
+const ICON_PAUSE = `<i class="bi bi-pause-fill"></i>`;
+
+const ICON_STOP = `<i class="bi bi-stop-fill"></i>`;
+
+const ICON_SLIDERS = `<i class="bi bi-sliders"></i>`;
+
+const ICON_FILETYPE_PDF = `<i class="bi bi-file-earmark-pdf"></i>`;
+
+const ICON_STYLED_HTML = `<i class="bi bi-link-45deg"></i>`;
+
+const ICON_RAW_HTML = `<i class="bi bi-filetype-html"></i>`;
+
+const ICON_MARKDOWN = `<i class="bi bi-markdown"></i>`;
 
 /**
  * カラーのYIQ明度計算による明暗判定 (背景色が暗い場合に文字色を白にするトグル用)
@@ -168,10 +150,7 @@ export function buildControlPanel(
     
     <!-- マークダウンコピー -->
     <button type="button" class="mv-toolbar-btn" id="mv-copy-button" title="Markdownをコピー">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2zm1-1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1H5v-1z"/>
-        <path d="M4 1.5v1h8v-1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
-      </svg>
+      ${ICON_CLIPBOARD}
     </button>
     
     <div class="mv-toolbar-divider"></div>
@@ -188,7 +167,7 @@ export function buildControlPanel(
       ${ICON_PLAY}
     </button>
     <button type="button" class="mv-toolbar-btn" id="mv-tts-stop-button" title="停止" style="display: none;">
-      ${ICON_STOP_SVG}
+      ${ICON_STOP}
     </button>
     
     <div class="mv-toolbar-divider"></div>
@@ -202,38 +181,27 @@ export function buildControlPanel(
     
     <!-- 設定を開く -->
     <button type="button" class="mv-toolbar-btn" id="mv-gear-button" title="設定を開く (T)">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
-      </svg>
+      ${ICON_SLIDERS}
     </button>
 
     <!-- エクスポートポップアップメニュー -->
     <div class="mv-export-popover" id="mv-export-popover">
       <button type="button" class="mv-export-item" id="mv-export-pdf">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
-          <path d="M4.603 12.087a.08.08 0 0 1-.059-.014c-.018-.013-.03-.037-.03-.071v-.78c0-.034.012-.057.03-.07a.08.08 0 0 1 .06-.015h.392c.11 0 .195-.022.253-.065.058-.043.087-.113.087-.21 0-.102-.03-.173-.088-.213-.058-.04-.143-.06-.252-.06H4.603a.08.08 0 0 1-.06-.015c-.018-.013-.03-.037-.03-.07v-.4c0-.032.012-.056.03-.069a.08.08 0 0 1 .06-.015h1.22c.036 0 .06.012.072.036a.1.1 0 0 1 .012.067v.4c0 .034-.008.056-.025.068a.08.08 0 0 1-.059.015h-.234v.24h.234c.036 0 .06.012.072.036a.1.1 0 0 1 .012.067v.4c0 .034-.008.056-.025.068a.08.08 0 0 1-.059.015h-.234v.463c0 .034-.012.058-.03.07a.08.08 0 0 1-.06.015h-.355zm2.146 0a.08.08 0 0 1-.06-.014c-.018-.013-.03-.037-.03-.071V9.584c0-.034.012-.057.03-.07a.08.08 0 0 1 .06-.015h.67c.28 0 .493.076.64.228.147.15.22.37.22.656 0 .28-.073.497-.22.65-.147.153-.36.23-.64.23h-.355v.78c0 .034-.012.057-.03.07a.08.08 0 0 1-.06.015zm.61-1.258h.273c.126 0 .219-.028.277-.083.058-.055.088-.145.088-.27 0-.12-.03-.207-.088-.26-.058-.053-.15-.08-.277-.08h-.273zm3.228 1.258a.08.08 0 0 1-.06-.014c-.018-.013-.03-.037-.03-.071V9.584c0-.034.012-.057.03-.07a.08.08 0 0 1 .06-.015h1.22c.036 0 .06.012.072.036a.1.1 0 0 1 .012.067v.4c0 .034-.008.056-.025.068a.08.08 0 0 1-.059.015h-.906v.4h.738c.036 0 .06.012.072.036a.1.1 0 0 1 .012.067v.4c0 .034-.008.056-.025.068a.08.08 0 0 1-.059.015h-.738v.78c0 .034-.012.057-.03.07a.08.08 0 0 1-.06.015z"/>
-        </svg>
+        ${ICON_FILETYPE_PDF}
         <span>PDF</span>
       </button>
       <button type="button" class="mv-export-item" id="mv-export-styled-html">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+        ${ICON_STYLED_HTML}
           <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
         </svg>
         <span>Styled HTML</span>
       </button>
       <button type="button" class="mv-export-item" id="mv-export-raw-html">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0m6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0"/>
-        </svg>
+        ${ICON_RAW_HTML}
         <span>Raw HTML</span>
       </button>
       <button type="button" class="mv-export-item" id="mv-export-md">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5zM11.5 4v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
-          <path fill-rule="evenodd" d="M8 5.5a.5.5 0 0 0-1 0v3.793L5.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L9 9.293z"/>
-        </svg>
+        ${ICON_MARKDOWN}
         <span>Markdown</span>
       </button>
     </div>
@@ -393,22 +361,15 @@ export function buildControlPanel(
         <h6 class="fw-bold mb-3 small text-uppercase tracking-wider text-muted">シェア・操作</h6>
         <div class="d-flex flex-column gap-2">
           <button type="button" class="btn btn-outline-primary btn-sm text-start py-2 px-3 d-flex align-items-center gap-2" id="mv-share-x">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.6.01zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633z"/>
-            </svg>
+            <i class="bi bi-twitter-x"></i>
             <span>X (Twitter) でシェア</span>
           </button>
           <button type="button" class="btn btn-outline-primary btn-sm text-start py-2 px-3 d-flex align-items-center gap-2" id="mv-share-fb">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.02 3.604-.02 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.73V6.275c0-2.017 1.194-3.112 3.022-3.112.872 0 1.785.164 1.785.164v1.987h-1.02c-.992 0-1.302.621-1.302 1.258v1.79h2.24l-.357 2.442h-1.883v5.625C12.983 15.397 16 12.067 16 8.049"/>
-            </svg>
+            <i class="bi bi-facebook"></i>
             <span>Facebook でシェア</span>
           </button>
           <button type="button" class="btn btn-outline-secondary btn-sm text-start py-2 px-3 d-flex align-items-center gap-2" id="mv-share-copy">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
-              <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
-            </svg>
+            <i class="bi bi-link-45deg"></i>
             <span>ファイルURLをコピー</span>
           </button>
         </div>
@@ -638,21 +599,11 @@ function setupPanelEvents(
     navigator.clipboard
       .writeText(markdownText)
       .then(() => {
-        copyBtn.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-check-fill text-success" viewBox="0 0 16 16">
-          <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5z"/>
-          <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5zm6.854 7.354-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708"/>
-        </svg>
-      `;
+        copyBtn.innerHTML = ICON_CLIPBOARD_CHECK;
         copyBtn.setAttribute("title", "コピーしました！");
 
         setTimeout(() => {
-          copyBtn.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2zm1-1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1H5v-1z"/>
-            <path d="M4 1.5v1h8v-1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
-          </svg>
-        `;
+          copyBtn.innerHTML = ICON_CLIPBOARD;
           copyBtn.setAttribute("title", "Markdownをコピー");
         }, 2000);
       })
