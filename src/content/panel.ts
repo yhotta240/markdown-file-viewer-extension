@@ -11,6 +11,7 @@ import { escapeHtml } from "../utils/html";
 import { clearLogs, getLogs, logError } from "../utils/logger";
 import { getSettings, setSettings } from "../utils/storage";
 import { exportMarkdown, exportPdf, exportRawHtml, exportStyledHtml } from "./export";
+import { type MarkdownFileInfo, renderFileInfoPopover } from "./file-info";
 import {
   getVoices,
   isSpeaking,
@@ -48,6 +49,8 @@ const ICON_STYLED_HTML = `<i class="bi bi-link-45deg"></i>`;
 const ICON_RAW_HTML = `<i class="bi bi-filetype-html"></i>`;
 
 const ICON_MARKDOWN = `<i class="bi bi-markdown"></i>`;
+
+const ICON_INFO = `<i class="bi bi-info-circle"></i>`;
 
 /**
  * カラーのYIQ明度計算による明暗判定 (背景色が暗い場合に文字色を白にするトグル用)
@@ -118,6 +121,7 @@ export function buildControlPanel(
   previewArea: HTMLElement,
   markdownText: string,
   onViewModeChange: (mode: "preview" | "source") => void,
+  fileInfo: MarkdownFileInfo,
 ): void {
   // ドキュメントマークダウンの読み込みと動的構築
   const docs = [usageDoc, shortcutsDoc, privacyDoc]
@@ -176,10 +180,17 @@ export function buildControlPanel(
     </button>
     
     <div class="mv-toolbar-divider"></div>
-
+    
     <!-- エクスポート -->
     <button type="button" class="mv-toolbar-btn" id="mv-export-button" title="エクスポート">
-      ${ICON_EXPORT}
+    ${ICON_EXPORT}
+    </button>
+
+    <div class="mv-toolbar-divider"></div>
+
+    <!-- ファイル情報 -->
+    <button type="button" class="mv-toolbar-btn" id="mv-file-info-button" title="ファイル情報" aria-describedby="mv-file-info-popover">
+      ${ICON_INFO}
     </button>
     
     <div class="mv-toolbar-divider"></div>
@@ -210,6 +221,8 @@ export function buildControlPanel(
         <span>Markdown</span>
       </button>
     </div>
+
+    ${renderFileInfoPopover(fileInfo)}
   `;
   appRoot.appendChild(toolbar);
 
@@ -489,6 +502,8 @@ function setupPanelEvents(
   const copyBtn = toolbar.querySelector("#mv-copy-button") as HTMLElement;
   const toggleViewBtn = toolbar.querySelector("#mv-toggle-view") as HTMLButtonElement;
   const printBtn = toolbar.querySelector("#mv-print-button") as HTMLElement;
+  const fileInfoBtn = toolbar.querySelector("#mv-file-info-button") as HTMLElement;
+  const fileInfoPopover = toolbar.querySelector("#mv-file-info-popover") as HTMLElement;
   const exportBtn = toolbar.querySelector("#mv-export-button") as HTMLElement;
   const exportPopover = toolbar.querySelector("#mv-export-popover") as HTMLElement;
 
@@ -545,6 +560,40 @@ function setupPanelEvents(
   // 印刷ボタン
   printBtn.addEventListener("click", () => {
     window.print();
+  });
+
+  // ファイル情報ポップアップ表示・非表示制御 (ホバー & クリック)
+  let fileInfoPopoverTimeout: number | null = null;
+  const showFileInfoPopover = () => {
+    if (fileInfoPopoverTimeout) {
+      clearTimeout(fileInfoPopoverTimeout);
+      fileInfoPopoverTimeout = null;
+    }
+    fileInfoPopover.classList.add("show");
+  };
+
+  const hideFileInfoPopover = () => {
+    fileInfoPopoverTimeout = window.setTimeout(() => {
+      fileInfoPopover.classList.remove("show");
+    }, 150);
+  };
+
+  fileInfoBtn.addEventListener("mouseenter", showFileInfoPopover);
+  fileInfoBtn.addEventListener("mouseleave", hideFileInfoPopover);
+  fileInfoPopover.addEventListener("mouseenter", showFileInfoPopover);
+  fileInfoPopover.addEventListener("mouseleave", hideFileInfoPopover);
+
+  fileInfoBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    fileInfoPopover.classList.toggle("show");
+  });
+
+  document.addEventListener("click", () => {
+    fileInfoPopover.classList.remove("show");
+  });
+
+  fileInfoPopover.addEventListener("click", (e) => {
+    e.stopPropagation();
   });
 
   // エクスポートメニューのポップアップ表示・非表示制御 (ホバー & クリック)

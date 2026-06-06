@@ -4,6 +4,7 @@ import "./code-theme.css";
 
 import { logError, logInfo } from "../utils/logger";
 import { isEnabled } from "../utils/storage";
+import { collectMarkdownFileInfo } from "./file-info";
 import { buildControlPanel } from "./panel";
 import { getMarkdownText, hideRawContent, renderPreview, setFavicon } from "./preview";
 import { buildTOC } from "./toc";
@@ -76,6 +77,7 @@ async function init() {
 
   // 目次 (TOC) の自動生成と構築
   buildTOC(previewArea, appRoot);
+  const fileInfo = collectMarkdownFileInfo(markdownText, previewArea);
 
   // 表示モード (プレビュー / ソースコード) の切り替え処理
   const onViewModeChange = (mode: "preview" | "source") => {
@@ -103,7 +105,7 @@ async function init() {
   };
 
   // コントロールパネル (Offcanvas設定画面、および統合ツールバー) の構築
-  buildControlPanel(appRoot, previewArea, markdownText, onViewModeChange);
+  buildControlPanel(appRoot, previewArea, markdownText, onViewModeChange, fileInfo);
 
   // 初期状態ではブラウザデフォルトの生ソースを非表示にする
   hideRawContent();
