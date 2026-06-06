@@ -7,6 +7,23 @@ import { buildControlPanel } from "./panel";
 import { getMarkdownText, hideRawContent, renderPreview, setFavicon } from "./preview";
 import { buildTOC } from "./toc";
 
+function waitForDocumentReady(): Promise<void> {
+  if (document.body && document.readyState !== "loading") {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    document.addEventListener("DOMContentLoaded", () => resolve(), { once: true });
+  });
+}
+
+function revealDocument(): void {
+  document.documentElement.style.opacity = "";
+  setTimeout(() => {
+    document.documentElement.style.transition = "";
+  }, 50);
+}
+
 // チラつき防止（FOUC対策）の即時実行処理
 (function preventFlash() {
   try {
@@ -26,20 +43,16 @@ async function init() {
   const enabled = await isEnabled();
   if (!enabled) {
     // 無効な場合は画面の非表示を解除して、ブラウザデフォルト表示に戻す
-    document.documentElement.style.opacity = "";
-    setTimeout(() => {
-      document.documentElement.style.transition = "";
-    }, 50);
+    revealDocument();
     return;
   }
+
+  await waitForDocumentReady();
 
   const markdownText = getMarkdownText();
   if (!markdownText) {
     logInfo("Markdown テキストが見つかりません", "content");
-    document.documentElement.style.opacity = "";
-    setTimeout(() => {
-      document.documentElement.style.transition = "";
-    }, 50);
+    revealDocument();
     return;
   }
 
@@ -97,10 +110,7 @@ async function init() {
   // 設定の適用完了後に非表示を解除し、フェードインさせる
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      document.documentElement.style.opacity = "";
-      setTimeout(() => {
-        document.documentElement.style.transition = "";
-      }, 50);
+      revealDocument();
     });
   });
 }
@@ -109,6 +119,5 @@ async function init() {
 init().catch((err) => {
   logError(`初期化に失敗しました`, "content", err);
   // エラー時も非表示状態を確実に解除
-  document.documentElement.style.opacity = "";
-  document.documentElement.style.transition = "";
+  revealDocument();
 });
