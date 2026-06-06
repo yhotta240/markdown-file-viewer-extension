@@ -186,11 +186,17 @@ function addCopyButtonsToCodeBlocks(root: HTMLElement): void {
     style.id = "mv-code-copy-style";
     style.textContent = `
       .mv-code-wrapper { position: relative; overflow: visible; }
-      /* シンプルで控えめなコピーボタン */
-      .mv-code-copy-btn {
+      .mv-code-wrapper pre.mv-code-wrap {
+        overflow-x: hidden;
+      }
+      .mv-code-wrapper pre.mv-code-wrap code {
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+      }
+      .mv-code-tool-btn {
         position: absolute;
         top: 6px;
-        right: 6px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -208,24 +214,27 @@ function addCopyButtonsToCodeBlocks(root: HTMLElement): void {
         box-shadow: 0 1px 2px rgba(16,24,32,0.06);
         backdrop-filter: blur(4px);
       }
+      .mv-code-wrap-btn { right: 38px; }
+      .mv-code-copy-btn { right: 6px; }
       /* ダークモード向けの色調整 */
       @media (prefers-color-scheme: dark) {
-        .mv-code-copy-btn {
+        .mv-code-tool-btn {
           background: rgba(28,31,36,0.6);
           color: #fff;
           border: 1px solid rgba(255,255,255,0.06);
           box-shadow: 0 1px 2px rgba(0,0,0,0.6);
         }
       }
-      .mv-code-wrapper:hover .mv-code-copy-btn {
+      .mv-code-wrapper:hover .mv-code-tool-btn,
+      .mv-code-tool-btn.active {
         opacity: 1;
         transform: scale(1);
       }
-      .mv-code-copy-btn:active {
+      .mv-code-tool-btn:active {
         transform: scale(0.97);
       }
-      .mv-code-copy-btn { padding: 0; box-sizing: border-box; }
-      .mv-code-copy-btn svg { pointer-events: none; width: 12px; height: 12px; display: block; }
+      .mv-code-tool-btn { padding: 0; box-sizing: border-box; }
+      .mv-code-tool-btn svg { pointer-events: none; width: 12px; height: 12px; display: block; }
     `;
     document.head.appendChild(style);
   }
@@ -240,9 +249,23 @@ function addCopyButtonsToCodeBlocks(root: HTMLElement): void {
     pre.parentNode?.insertBefore(wrapper, pre);
     wrapper.appendChild(pre);
 
+    // 折り返し切り替えボタン
+    const wrapBtn = document.createElement("button");
+    wrapBtn.className = "mv-code-tool-btn mv-code-wrap-btn";
+    wrapBtn.type = "button";
+    wrapBtn.title = "折り返し";
+    wrapBtn.innerHTML = `<i class="bi bi-text-wrap"></i>`;
+
+    wrapBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const enabled = pre.classList.toggle("mv-code-wrap");
+      wrapBtn.classList.toggle("active", enabled);
+      wrapBtn.title = enabled ? "折り返しを解除" : "折り返し";
+    });
+
     // コピー用ボタン
     const btn = document.createElement("button");
-    btn.className = "mv-code-copy-btn";
+    btn.className = "mv-code-tool-btn mv-code-copy-btn";
     btn.type = "button";
     btn.title = "コピー";
     btn.innerHTML = `<i class="bi bi-copy"></i>`;
@@ -269,6 +292,7 @@ function addCopyButtonsToCodeBlocks(root: HTMLElement): void {
       }
     });
 
+    wrapper.appendChild(wrapBtn);
     wrapper.appendChild(btn);
   });
 }
