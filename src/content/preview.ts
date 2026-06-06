@@ -1,4 +1,5 @@
 import { marked } from "marked";
+import { EXTENSION_SHORT_NAME } from "../settings";
 
 /**
  * ページ内の pre 要素からマークダウンテキストを抽出する
@@ -230,6 +231,6 @@ export function setFavicon(): void {
     link.href = chrome.runtime.getURL("icons/icon.png");
     document.head.appendChild(link);
   } catch (error) {
-    console.warn("Markdown View: ファビコンの設定に失敗しました", error);
+    console.warn(`${EXTENSION_SHORT_NAME}: ファビコンの設定に失敗しました`, error);
   }
 }

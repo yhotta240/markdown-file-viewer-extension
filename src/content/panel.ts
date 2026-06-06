@@ -1,7 +1,12 @@
 import privacyDoc from "../../docs/privacy.md";
 import shortcutsDoc from "../../docs/shortcuts.md";
 import usageDoc from "../../docs/usage.md";
-import { DEFAULT_SETTINGS, type Settings } from "../settings";
+import {
+  DEFAULT_SETTINGS,
+  EXTENSION_SHORT_NAME,
+  EXTENSION_VERSION,
+  type Settings,
+} from "../settings";
 import { escapeHtml } from "../utils/html";
 import { clearLogs, getLogs } from "../utils/logger";
 import { getSettings, setSettings } from "../utils/storage";
@@ -222,7 +227,7 @@ export function buildControlPanel(
 
   offcanvas.innerHTML = `
     <div class="offcanvas-header border-bottom py-3">
-      <h5 class="offcanvas-title fw-bold">Markdown View 設定</h5>
+      <h5 class="offcanvas-title fw-bold">${EXTENSION_SHORT_NAME} 設定</h5>
       <button type="button" class="btn-close" id="mv-close-button" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
@@ -409,11 +414,11 @@ export function buildControlPanel(
         <div class="border rounded p-3 bg-body-tertiary small text-secondary">
           <div class="d-flex justify-content-between mb-1">
             <span>拡張機能名:</span>
-            <span class="fw-medium">Markdown View</span>
+            <span class="fw-medium">${EXTENSION_SHORT_NAME}</span>
           </div>
           <div class="d-flex justify-content-between mb-1">
             <span>バージョン:</span>
-            <span class="fw-medium">0.3.0</span>
+            <span class="fw-medium">${EXTENSION_VERSION}</span>
           </div>
           <div class="d-flex justify-content-between mb-1">
             <span>パーサー:</span>
@@ -608,7 +613,7 @@ function setupPanelEvents(
         }, 2000);
       })
       .catch((err) => {
-        console.error("Markdown View: コピーに失敗しました", err);
+        console.error(`${EXTENSION_SHORT_NAME}: コピーに失敗しました`, err);
       });
   });
 
@@ -1141,7 +1146,7 @@ function setupPanelEvents(
 
   // シェア
   offcanvas.querySelector("#mv-share-x")?.addEventListener("click", () => {
-    const text = encodeURIComponent(`Markdown View でプレビュー中: ${document.title}`);
+    const text = encodeURIComponent(`${EXTENSION_SHORT_NAME}: でプレビュー中: ${document.title}`);
     const url = encodeURIComponent(location.href);
     window.open(`https://x.com/intent/post?text=${text}&url=${url}`, "_blank");
   });
@@ -1155,10 +1160,10 @@ function setupPanelEvents(
     navigator.clipboard
       .writeText(location.href)
       .then(() => {
-        alert("ファイルURLをクリップボードにコピーしました！");
+        alert(`${EXTENSION_SHORT_NAME}: ファイルURLをクリップボードにコピーしました！`);
       })
       .catch((err) => {
-        console.error("Markdown View: URLコピーに失敗しました", err);
+        console.error(`${EXTENSION_SHORT_NAME}: URLコピーに失敗しました`, err);
       });
   });
 }

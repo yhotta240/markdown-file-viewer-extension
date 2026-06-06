@@ -32,3 +32,6 @@ export const DEFAULT_SETTINGS: Required<Settings> = {
   ttsVolume: 1.0,
   autoReadOnLoad: false,
 };
+
+export const EXTENSION_SHORT_NAME = chrome.runtime.getManifest().short_name;
+export const EXTENSION_VERSION = chrome.runtime.getManifest().version;
