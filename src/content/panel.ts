@@ -301,6 +301,15 @@ export function buildControlPanel(
           <input type="range" class="form-range" min="500" max="1200" step="20" id="mv-max-width-slider" value="860">
         </div>
 
+        <!-- 画像最大高さ -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-2">
+            <label for="mv-image-max-height-slider" class="form-label small fw-semibold text-secondary mb-0">画像最大高さ</label>
+            <span class="badge bg-secondary-subtle text-secondary-emphasis" id="mv-image-max-height-badge">70%</span>
+          </div>
+          <input type="range" class="form-range" min="40" max="100" step="5" id="mv-image-max-height-slider" value="70">
+        </div>
+
         <!-- フォントサイズ -->
         <div class="mb-3">
           <div class="d-flex justify-content-between mb-2">
@@ -630,6 +639,12 @@ function setupPanelEvents(
   const maxWidthSlider = offcanvas.querySelector("#mv-max-width-slider") as HTMLInputElement;
   const maxWidthBadge = offcanvas.querySelector("#mv-max-width-badge") as HTMLElement;
 
+  // 画像最大高さ関連
+  const imageMaxHeightSlider = offcanvas.querySelector(
+    "#mv-image-max-height-slider",
+  ) as HTMLInputElement;
+  const imageMaxHeightBadge = offcanvas.querySelector("#mv-image-max-height-badge") as HTMLElement;
+
   // TTS 設定関連
   const ttsVoiceSelect = offcanvas.querySelector("#mv-tts-voice-select") as HTMLSelectElement;
   const ttsRateSlider = offcanvas.querySelector("#mv-tts-rate-slider") as HTMLInputElement;
@@ -747,6 +762,13 @@ function setupPanelEvents(
       fontSizeSlider.value = String(settings.fontSize);
       fontSizeBadge.textContent = `${settings.fontSize}px`;
       previewArea.style.fontSize = `${settings.fontSize}px`;
+    }
+
+    // 6. 画像最大高さの適用
+    if (settings.imageMaxHeight) {
+      imageMaxHeightSlider.value = String(settings.imageMaxHeight);
+      imageMaxHeightBadge.textContent = `${settings.imageMaxHeight}%`;
+      previewArea.style.setProperty("--mv-image-max-height", `${settings.imageMaxHeight}vh`);
     }
 
     // 7. TTS 設定の適用
@@ -1069,6 +1091,19 @@ function setupPanelEvents(
   fontSizeSlider.addEventListener("change", (e) => {
     const value = Number((e.target as HTMLInputElement).value);
     saveAndApply({ fontSize: value });
+  });
+
+  // 画像最大高さ変更中
+  imageMaxHeightSlider.addEventListener("input", (e) => {
+    const value = Number((e.target as HTMLInputElement).value);
+    imageMaxHeightBadge.textContent = `${value}%`;
+    previewArea.style.setProperty("--mv-image-max-height", `${value}vh`);
+  });
+
+  // 画像最大高さ変更確定
+  imageMaxHeightSlider.addEventListener("change", (e) => {
+    const value = Number((e.target as HTMLInputElement).value);
+    saveAndApply({ imageMaxHeight: value });
   });
 
   // TTS ボイス変更

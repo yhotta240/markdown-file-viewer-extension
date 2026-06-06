@@ -130,7 +130,9 @@ body {
 /* 画像の最大幅 */
 #mv-preview-area img {
   max-width: 100%;
+  max-height: var(--mv-image-max-height, 70vh);
   height: auto;
+  object-fit: contain;
 }
 
 /* 統合型フローティングツールバー（極めてシンプルでコンパクト） */

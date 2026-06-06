@@ -6,6 +6,7 @@ export type Settings = {
   customFg?: string;
   customBg?: string;
   maxWidth?: number;
+  imageMaxHeight?: number;
   // Text-to-Speech settings
   ttsEnabled?: boolean;
   ttsVoice?: string;
@@ -23,6 +24,7 @@ export const DEFAULT_SETTINGS: Required<Settings> = {
   customFg: "#191b1f",
   customBg: "#ffffff",
   maxWidth: 860,
+  imageMaxHeight: 70,
   ttsEnabled: false,
   ttsVoice: "",
   ttsRate: 1.0,
