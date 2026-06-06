@@ -1,0 +1,228 @@
+/* Code block theme presets */
+#mv-preview-area {
+  --mv-code-bg: var(--bs-tertiary-bg);
+  --mv-code-color: var(--bs-body-color);
+  --mv-code-border: var(--bs-border-color);
+  --mv-code-inline-bg: var(--bs-secondary-bg);
+  --mv-code-inline-color: var(--bs-danger-text-emphasis);
+  --mv-code-shadow: none;
+  --mv-code-comment: #6a737d;
+  --mv-code-keyword: #8250df;
+  --mv-code-string: #0a3069;
+  --mv-code-number: #0550ae;
+  --mv-code-title: #953800;
+  --mv-code-attr: #116329;
+  --mv-code-built-in: #cf222e;
+  --mv-code-literal: #0550ae;
+  --mv-code-meta: #57606a;
+}
+
+[data-bs-theme="dark"] #mv-preview-area {
+  --mv-code-bg: #1f2329;
+  --mv-code-color: #e5e7eb;
+  --mv-code-border: #3a414b;
+  --mv-code-inline-bg: rgba(110, 118, 129, 0.35);
+  --mv-code-inline-color: #fda4af;
+  --mv-code-comment: #9ca3af;
+  --mv-code-keyword: #c4b5fd;
+  --mv-code-string: #93c5fd;
+  --mv-code-number: #67e8f9;
+  --mv-code-title: #f9a8d4;
+  --mv-code-attr: #86efac;
+  --mv-code-built-in: #fdba74;
+  --mv-code-literal: #67e8f9;
+  --mv-code-meta: #9ca3af;
+}
+
+#mv-preview-area[data-code-theme="github"] {
+  --mv-code-bg: #f6f8fa;
+  --mv-code-color: #1f2328;
+  --mv-code-border: #d0d7de;
+  --mv-code-inline-bg: rgba(175, 184, 193, 0.2);
+  --mv-code-inline-color: #cf222e;
+  --mv-code-comment: #6e7781;
+  --mv-code-keyword: #cf222e;
+  --mv-code-string: #0a3069;
+  --mv-code-number: #0550ae;
+  --mv-code-title: #8250df;
+  --mv-code-attr: #116329;
+  --mv-code-built-in: #953800;
+  --mv-code-literal: #0550ae;
+  --mv-code-meta: #57606a;
+}
+
+[data-bs-theme="dark"] #mv-preview-area[data-code-theme="github"] {
+  --mv-code-bg: #161b22;
+  --mv-code-color: #e6edf3;
+  --mv-code-border: #30363d;
+  --mv-code-inline-bg: rgba(110, 118, 129, 0.4);
+  --mv-code-inline-color: #ff7b72;
+  --mv-code-comment: #8b949e;
+  --mv-code-keyword: #ff7b72;
+  --mv-code-string: #a5d6ff;
+  --mv-code-number: #79c0ff;
+  --mv-code-title: #d2a8ff;
+  --mv-code-attr: #7ee787;
+  --mv-code-built-in: #ffa657;
+  --mv-code-literal: #79c0ff;
+  --mv-code-meta: #8b949e;
+}
+
+#mv-preview-area[data-code-theme="soft"] {
+  --mv-code-bg: #f8fafc;
+  --mv-code-color: #273449;
+  --mv-code-border: #dbe3ed;
+  --mv-code-inline-bg: #eef3f8;
+  --mv-code-inline-color: #9f1239;
+  --mv-code-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  --mv-code-comment: #64748b;
+  --mv-code-keyword: #7c3aed;
+  --mv-code-string: #047857;
+  --mv-code-number: #0369a1;
+  --mv-code-title: #be123c;
+  --mv-code-attr: #0f766e;
+  --mv-code-built-in: #c2410c;
+  --mv-code-literal: #2563eb;
+  --mv-code-meta: #64748b;
+}
+
+[data-bs-theme="dark"] #mv-preview-area[data-code-theme="soft"] {
+  --mv-code-bg: #1f252d;
+  --mv-code-color: #e5e7eb;
+  --mv-code-border: #3a4654;
+  --mv-code-inline-bg: #2a3440;
+  --mv-code-inline-color: #fda4af;
+  --mv-code-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --mv-code-comment: #94a3b8;
+  --mv-code-keyword: #c4b5fd;
+  --mv-code-string: #86efac;
+  --mv-code-number: #7dd3fc;
+  --mv-code-title: #fda4af;
+  --mv-code-attr: #5eead4;
+  --mv-code-built-in: #fdba74;
+  --mv-code-literal: #93c5fd;
+  --mv-code-meta: #94a3b8;
+}
+
+#mv-preview-area[data-code-theme="contrast"] {
+  --mv-code-bg: #ffffff;
+  --mv-code-color: #0b0f19;
+  --mv-code-border: #0b0f19;
+  --mv-code-inline-bg: #fff3bf;
+  --mv-code-inline-color: #7f1d1d;
+  --mv-code-comment: #4b5563;
+  --mv-code-keyword: #0000cc;
+  --mv-code-string: #006600;
+  --mv-code-number: #990000;
+  --mv-code-title: #7c2d12;
+  --mv-code-attr: #004d40;
+  --mv-code-built-in: #8b0000;
+  --mv-code-literal: #0000cc;
+  --mv-code-meta: #374151;
+}
+
+[data-bs-theme="dark"] #mv-preview-area[data-code-theme="contrast"] {
+  --mv-code-bg: #000000;
+  --mv-code-color: #ffffff;
+  --mv-code-border: #ffffff;
+  --mv-code-inline-bg: #2b2b00;
+  --mv-code-inline-color: #fff59d;
+  --mv-code-comment: #d1d5db;
+  --mv-code-keyword: #93c5fd;
+  --mv-code-string: #86efac;
+  --mv-code-number: #fca5a5;
+  --mv-code-title: #fcd34d;
+  --mv-code-attr: #67e8f9;
+  --mv-code-built-in: #f9a8d4;
+  --mv-code-literal: #c4b5fd;
+  --mv-code-meta: #e5e7eb;
+}
+
+#mv-preview-area[data-code-theme="terminal"] {
+  --mv-code-bg: #101418;
+  --mv-code-color: #d8f3dc;
+  --mv-code-border: #2a333c;
+  --mv-code-inline-bg: #182026;
+  --mv-code-inline-color: #80ed99;
+  --mv-code-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --mv-code-comment: #7d8590;
+  --mv-code-keyword: #ff79c6;
+  --mv-code-string: #50fa7b;
+  --mv-code-number: #bd93f9;
+  --mv-code-title: #8be9fd;
+  --mv-code-attr: #f1fa8c;
+  --mv-code-built-in: #ffb86c;
+  --mv-code-literal: #bd93f9;
+  --mv-code-meta: #8be9fd;
+}
+
+#mv-preview-area pre {
+  padding: 1rem;
+  overflow-x: auto;
+  background-color: var(--mv-code-bg);
+  border: 1px solid var(--mv-code-border);
+  border-radius: 0.375rem;
+  box-shadow: var(--mv-code-shadow);
+  color: var(--mv-code-color);
+}
+
+#mv-preview-area code {
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9em;
+}
+
+#mv-preview-area pre code {
+  color: inherit;
+  background-color: transparent;
+}
+
+#mv-preview-area :not(pre) > code {
+  padding: 0.2rem 0.4rem;
+  background-color: var(--mv-code-inline-bg);
+  border-radius: 0.25rem;
+  color: var(--mv-code-inline-color);
+}
+
+#mv-preview-area :is(.hljs-comment, .hljs-quote) {
+  color: var(--mv-code-comment);
+}
+
+#mv-preview-area :is(.hljs-keyword, .hljs-selector-tag, .hljs-subst) {
+  color: var(--mv-code-keyword);
+}
+
+#mv-preview-area :is(.hljs-string, .hljs-doctag, .hljs-regexp) {
+  color: var(--mv-code-string);
+}
+
+#mv-preview-area :is(.hljs-number, .hljs-symbol, .hljs-bullet) {
+  color: var(--mv-code-number);
+}
+
+#mv-preview-area :is(.hljs-title, .hljs-section, .hljs-name) {
+  color: var(--mv-code-title);
+}
+
+#mv-preview-area :is(.hljs-attr, .hljs-attribute, .hljs-variable, .hljs-template-variable) {
+  color: var(--mv-code-attr);
+}
+
+#mv-preview-area :is(.hljs-built_in, .hljs-type, .hljs-class .hljs-title) {
+  color: var(--mv-code-built-in);
+}
+
+#mv-preview-area .hljs-literal {
+  color: var(--mv-code-literal);
+}
+
+#mv-preview-area .hljs-meta {
+  color: var(--mv-code-meta);
+}
+
+#mv-preview-area .hljs-emphasis {
+  font-style: italic;
+}
+
+#mv-preview-area .hljs-strong {
+  font-weight: 700;
+}

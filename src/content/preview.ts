@@ -1,5 +1,45 @@
+import hljs from "highlight.js/lib/core";
+import bash from "highlight.js/lib/languages/bash";
+import css from "highlight.js/lib/languages/css";
+import go from "highlight.js/lib/languages/go";
+import java from "highlight.js/lib/languages/java";
+import javascript from "highlight.js/lib/languages/javascript";
+import json from "highlight.js/lib/languages/json";
+import markdown from "highlight.js/lib/languages/markdown";
+import php from "highlight.js/lib/languages/php";
+import powershell from "highlight.js/lib/languages/powershell";
+import python from "highlight.js/lib/languages/python";
+import ruby from "highlight.js/lib/languages/ruby";
+import rust from "highlight.js/lib/languages/rust";
+import shell from "highlight.js/lib/languages/shell";
+import sql from "highlight.js/lib/languages/sql";
+import typescript from "highlight.js/lib/languages/typescript";
+import xml from "highlight.js/lib/languages/xml";
+import yaml from "highlight.js/lib/languages/yaml";
 import { marked } from "marked";
 import { logError, logWarn } from "../utils/logger";
+
+hljs.registerLanguage("bash", bash);
+hljs.registerLanguage("css", css);
+hljs.registerLanguage("go", go);
+hljs.registerLanguage("java", java);
+hljs.registerLanguage("javascript", javascript);
+hljs.registerLanguage("json", json);
+hljs.registerLanguage("markdown", markdown);
+hljs.registerLanguage("php", php);
+hljs.registerLanguage("powershell", powershell);
+hljs.registerLanguage("python", python);
+hljs.registerLanguage("ruby", ruby);
+hljs.registerLanguage("rust", rust);
+hljs.registerLanguage("shell", shell);
+hljs.registerLanguage("sql", sql);
+hljs.registerLanguage("typescript", typescript);
+hljs.registerLanguage("xml", xml);
+hljs.registerLanguage("yaml", yaml);
+hljs.registerAliases(["js", "jsx"], { languageName: "javascript" });
+hljs.registerAliases(["ts", "tsx"], { languageName: "typescript" });
+hljs.registerAliases(["html", "xhtml", "svg"], { languageName: "xml" });
+hljs.registerAliases(["yml"], { languageName: "yaml" });
 
 /**
  * ページ内の pre 要素からマークダウンテキストを抽出する
@@ -75,6 +115,23 @@ function applyBootstrapClasses(container: HTMLElement): void {
 }
 
 /**
+ * コードブロックにシンタックスハイライトを適用する
+ */
+function highlightCodeBlocks(container: HTMLElement): void {
+  container.querySelectorAll<HTMLElement>("pre code").forEach((code) => {
+    try {
+      hljs.highlightElement(code);
+    } catch (error) {
+      logWarn(
+        "コードブロックのシンタックスハイライトに失敗しました",
+        "content",
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+  });
+}
+
+/**
  * プレビュー用DOMを生成し、HTMLプレビュー領域と生ソースコード領域を両方流し込む
  */
 export async function renderPreview(markdownText: string): Promise<HTMLElement> {
@@ -87,6 +144,9 @@ export async function renderPreview(markdownText: string): Promise<HTMLElement> 
 
   const parsedHtml = await marked.parse(markdownText);
   previewRender.innerHTML = parsedHtml;
+
+  // コードブロックに言語別シンタックスハイライトを適用
+  highlightCodeBlocks(previewRender);
 
   // コードブロックにコピー機能を追加
   addCopyButtonsToCodeBlocks(previewRender);

@@ -7,6 +7,7 @@ export type Settings = {
   customBg?: string;
   maxWidth?: number;
   imageMaxHeight?: number;
+  codeBlockTheme?: "default" | "github" | "soft" | "contrast" | "terminal";
   // Text-to-Speech settings
   ttsEnabled?: boolean;
   ttsVoice?: string;
@@ -25,6 +26,7 @@ export const DEFAULT_SETTINGS: Required<Settings> = {
   customBg: "#ffffff",
   maxWidth: 860,
   imageMaxHeight: 70,
+  codeBlockTheme: "default",
   ttsEnabled: false,
   ttsVoice: "",
   ttsRate: 1.0,

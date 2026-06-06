@@ -106,27 +106,6 @@ body {
   margin-bottom: 0.4rem;
 }
 
-/* コードブロックの装飾 */
-#mv-preview-area pre {
-  padding: 1rem;
-  background-color: var(--bs-tertiary-bg);
-  border: 1px solid var(--bs-border-color);
-  border-radius: 0.375rem;
-  overflow-x: auto;
-}
-
-#mv-preview-area code {
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 0.9em;
-}
-
-#mv-preview-area :not(pre) > code {
-  padding: 0.2rem 0.4rem;
-  background-color: var(--bs-secondary-bg);
-  border-radius: 0.25rem;
-  color: var(--bs-danger-text-emphasis);
-}
-
 /* 画像の最大幅 */
 #mv-preview-area img {
   max-width: 100%;

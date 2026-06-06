@@ -292,6 +292,18 @@ export function buildControlPanel(
           </select>
         </div>
 
+        <!-- コードブロックテーマ -->
+        <div class="mb-3">
+          <label for="mv-code-block-theme-select" class="form-label small fw-semibold text-secondary mb-2">コードブロックテーマ</label>
+          <select class="form-select form-select-sm" id="mv-code-block-theme-select">
+            <option value="default">標準</option>
+            <option value="github">GitHub</option>
+            <option value="soft">ソフト</option>
+            <option value="contrast">高コントラスト</option>
+            <option value="terminal">ターミナル</option>
+          </select>
+        </div>
+
         <!-- プレビュー最大横幅 -->
         <div class="mb-3">
           <div class="d-flex justify-content-between mb-2">
@@ -625,6 +637,9 @@ function setupPanelEvents(
   const fontSizeSlider = offcanvas.querySelector("#mv-font-size-slider") as HTMLInputElement;
   const fontSizeBadge = offcanvas.querySelector("#mv-font-size-badge") as HTMLElement;
   const fontSelect = offcanvas.querySelector("#mv-font-family-select") as HTMLSelectElement;
+  const codeBlockThemeSelect = offcanvas.querySelector(
+    "#mv-code-block-theme-select",
+  ) as HTMLSelectElement;
 
   // カスタムカラーピッカー関連
   const customColorsContainer = offcanvas.querySelector(
@@ -771,7 +786,13 @@ function setupPanelEvents(
       previewArea.style.setProperty("--mv-image-max-height", `${settings.imageMaxHeight}vh`);
     }
 
-    // 7. TTS 設定の適用
+    // 7. コードブロックテーマの適用
+    if (settings.codeBlockTheme) {
+      codeBlockThemeSelect.value = settings.codeBlockTheme;
+      previewArea.dataset.codeTheme = settings.codeBlockTheme;
+    }
+
+    // 8. TTS 設定の適用
     ttsRateSlider.value = String(settings.ttsRate);
     ttsRateBadge.textContent = `${settings.ttsRate.toFixed(1)}x`;
     ttsPitchSlider.value = String(settings.ttsPitch);
@@ -1078,6 +1099,12 @@ function setupPanelEvents(
   fontSelect.addEventListener("change", (e) => {
     const value = (e.target as HTMLSelectElement).value;
     saveAndApply({ fontFamily: value });
+  });
+
+  // コードブロックテーマ変更
+  codeBlockThemeSelect.addEventListener("change", (e) => {
+    const value = (e.target as HTMLSelectElement).value as Settings["codeBlockTheme"];
+    saveAndApply({ codeBlockTheme: value });
   });
 
   // フォントサイズ変更中

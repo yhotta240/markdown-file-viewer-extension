@@ -1,5 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./style.css";
+import "./code-theme.css";
 
 import { logError, logInfo } from "../utils/logger";
 import { isEnabled } from "../utils/storage";
