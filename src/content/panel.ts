@@ -8,7 +8,7 @@ import {
   type Settings,
 } from "../settings";
 import { escapeHtml } from "../utils/html";
-import { clearLogs, getLogs } from "../utils/logger";
+import { clearLogs, getLogs, logError } from "../utils/logger";
 import { getSettings, setSettings } from "../utils/storage";
 import { exportMarkdown, exportPdf, exportRawHtml, exportStyledHtml } from "./export";
 import {
@@ -607,7 +607,7 @@ function setupPanelEvents(
         }, 2000);
       })
       .catch((err) => {
-        console.error(`${EXTENSION_SHORT_NAME}: コピーに失敗しました`, err);
+        logError(`コピーに失敗しました`, "content", err);
       });
   });
 
@@ -938,7 +938,7 @@ function setupPanelEvents(
         }
         await startTtsPlayback();
       } catch (err) {
-        console.error("TTS play failed", err);
+        logError("TTS play failed", "content", err);
       }
     });
   }
@@ -950,7 +950,7 @@ function setupPanelEvents(
         clearTtsHighlight();
         updateTtsButtonUI();
       } catch (err) {
-        console.error("TTS stop failed", err);
+        logError("TTS stop failed", "content", err);
       }
     });
   }
@@ -982,7 +982,7 @@ function setupPanelEvents(
             }
             await startTtsPlayback();
           } catch (err) {
-            console.error("TTS shortcut failed", err);
+            logError("TTS shortcut failed", "content", err);
           }
         })();
       }
@@ -1145,7 +1145,7 @@ function setupPanelEvents(
         alert(`${EXTENSION_SHORT_NAME}: ファイルURLをクリップボードにコピーしました！`);
       })
       .catch((err) => {
-        console.error(`${EXTENSION_SHORT_NAME}: URLコピーに失敗しました`, err);
+        logError("URLコピーに失敗しました", "content", err);
       });
   });
 }

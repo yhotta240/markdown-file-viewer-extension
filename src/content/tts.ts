@@ -1,3 +1,5 @@
+import { logWarn } from "../utils/logger";
+
 /** Web Speech API (SpeechSynthesis) を使ったローカル完結の読み上げモジュール */
 export type TTSOptions = {
   voice?: SpeechSynthesisVoice | null;
@@ -89,7 +91,7 @@ export function speak(
   onBoundary?: (charIndex: number, charLength: number) => void,
 ): void {
   if (!isSupported()) {
-    console.warn("TTS: SpeechSynthesis not supported in this browser");
+    logWarn("TTS: SpeechSynthesis not supported in this browser", "content");
     return;
   }
   stop(); // 既存の発話をキャンセルし _charOffset をリセット

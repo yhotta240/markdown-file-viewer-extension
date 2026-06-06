@@ -1,11 +1,11 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./style.css";
 
+import { logError, logInfo } from "../utils/logger";
 import { isEnabled } from "../utils/storage";
 import { buildControlPanel } from "./panel";
 import { getMarkdownText, hideRawContent, renderPreview, setFavicon } from "./preview";
 import { buildTOC } from "./toc";
-import { EXTENSION_SHORT_NAME } from "../settings";
 
 // チラつき防止（FOUC対策）の即時実行処理
 (function preventFlash() {
@@ -18,7 +18,7 @@ import { EXTENSION_SHORT_NAME } from "../settings";
     const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     document.documentElement.setAttribute("data-bs-theme", isDark ? "dark" : "light");
   } catch (err) {
-    console.error(`${EXTENSION_SHORT_NAME}: preventFlash failed`, err);
+    logError(`preventFlash failed`, "content", err);
   }
 })();
 
@@ -35,7 +35,7 @@ async function init() {
 
   const markdownText = getMarkdownText();
   if (!markdownText) {
-    console.log(`${EXTENSION_SHORT_NAME}: No markdown content found.`);
+    logInfo("Markdown テキストが見つかりません", "content");
     document.documentElement.style.opacity = "";
     setTimeout(() => {
       document.documentElement.style.transition = "";
@@ -107,7 +107,7 @@ async function init() {
 
 // 実行
 init().catch((err) => {
-  console.error(`${EXTENSION_SHORT_NAME}: initialization failed`, err);
+  logError(`初期化に失敗しました`, "content", err);
   // エラー時も非表示状態を確実に解除
   document.documentElement.style.opacity = "";
   document.documentElement.style.transition = "";

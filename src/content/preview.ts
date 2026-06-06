@@ -1,5 +1,5 @@
 import { marked } from "marked";
-import { EXTENSION_SHORT_NAME } from "../settings";
+import { logError, logWarn } from "../utils/logger";
 
 /**
  * ページ内の pre 要素からマークダウンテキストを抽出する
@@ -205,7 +205,7 @@ function addCopyButtonsToCodeBlocks(root: HTMLElement): void {
           btn.style.color = prevColor;
         }, 1600);
       } catch (err) {
-        console.error("コピーに失敗しました", err);
+        logError("コピーに失敗しました", "content", err);
       }
     });
 
@@ -231,6 +231,10 @@ export function setFavicon(): void {
     link.href = chrome.runtime.getURL("icons/icon.png");
     document.head.appendChild(link);
   } catch (error) {
-    console.warn(`${EXTENSION_SHORT_NAME}: ファビコンの設定に失敗しました`, error);
+    logWarn(
+      `ファビコンの設定に失敗しました`,
+      "content",
+      error instanceof Error ? error.message : String(error),
+    );
   }
 }
