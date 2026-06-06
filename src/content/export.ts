@@ -1,3 +1,5 @@
+import { logError } from "../utils/logger";
+
 function downloadFile(content: string, contentType: string, filename: string): void {
   const blob = new Blob([content], { type: contentType });
   const url = URL.createObjectURL(blob);
@@ -15,11 +17,19 @@ export function exportPdf(): void {
 }
 
 export function exportMarkdown(markdownText: string, filename: string): void {
-  downloadFile(markdownText, "text/markdown;charset=utf-8", filename);
+  try {
+    downloadFile(markdownText, "text/markdown;charset=utf-8", filename);
+  } catch (error) {
+    logError("Markdown ファイルのダウンロードに失敗しました:", "content", error);
+  }
 }
 
 export function exportRawHtml(htmlContent: string, filename: string): void {
-  downloadFile(htmlContent, "text/html;charset=utf-8", filename);
+  try {
+    downloadFile(htmlContent, "text/html;charset=utf-8", filename);
+  } catch (error) {
+    logError("HTML ファイルのダウンロードに失敗しました:", "content", error);
+  }
 }
 
 export function exportStyledHtml(htmlContent: string, title: string, filename: string): void {
@@ -120,7 +130,11 @@ export function exportStyledHtml(htmlContent: string, title: string, filename: s
 </body>
 </html>`;
 
-  downloadFile(fullHtml, "text/html;charset=utf-8", filename);
+  try {
+    downloadFile(fullHtml, "text/html;charset=utf-8", filename);
+  } catch (error) {
+    logError("スタイル付き HTML ファイルのダウンロードに失敗しました:", "content", error);
+  }
 }
 
 function escapeHtml(str: string): string {
