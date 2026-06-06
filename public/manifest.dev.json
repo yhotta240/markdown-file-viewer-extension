@@ -11,7 +11,11 @@
     "storage",
     "tabs"
   ],
-  "action": {},
+  "action": {
+    "default_icon": {
+      "48": "icons/icon.png"
+    }
+  },
   "host_permissions": [
     "https://*/*.md",
     "https://*/*.markdown",

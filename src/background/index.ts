@@ -1,3 +1,4 @@
+import { EXTENSION_SHORT_NAME, EXTENSION_VERSION } from "../settings";
 import { logInfo } from "../utils/logger";
 import { reloadTargetTabs } from "../utils/reload-tabs";
 import { isEnabled, setEnabled } from "../utils/storage";
@@ -6,10 +7,12 @@ const targetMdUrls = ["file:///*/*.md", "file:///*/*.markdown"];
 
 async function updateBadgeState() {
   const enabled = await isEnabled();
-  const text = enabled ? "ON" : "OFF";
-  const color = enabled ? "#198754" : "#dc3545";
-  chrome.action.setBadgeText({ text });
-  chrome.action.setBadgeBackgroundColor({ color });
+  chrome.action.setIcon({
+    path: enabled ? "icons/icon.png" : "icons/icon-disabled.png",
+  });
+  chrome.action.setTitle({
+    title: enabled ? `${EXTENSION_SHORT_NAME}: 有効` : `${EXTENSION_SHORT_NAME}: 無効`,
+  });
 }
 
 chrome.runtime.onInstalled.addListener(async (details) => {
@@ -18,7 +21,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     await setEnabled(true);
   } else if (details.reason === "update") {
     logInfo(
-      `拡張機能がアップデートされました (v${details.previousVersion ?? "?"} → v${chrome.runtime.getManifest().version})`,
+      `拡張機能がアップデートされました (v${details.previousVersion ?? "?"} → v${EXTENSION_VERSION})`,
       "background",
     );
   }
