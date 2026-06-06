@@ -208,8 +208,6 @@ export function buildControlPanel(
       </button>
       <button type="button" class="mv-export-item" id="mv-export-styled-html">
         ${ICON_STYLED_HTML}
-          <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
-        </svg>
         <span>Styled HTML</span>
       </button>
       <button type="button" class="mv-export-item" id="mv-export-raw-html">
@@ -240,7 +238,10 @@ export function buildControlPanel(
 
   offcanvas.innerHTML = `
     <div class="offcanvas-header border-bottom py-3">
-      <h5 class="offcanvas-title fw-bold">${EXTENSION_SHORT_NAME} 設定</h5>
+      <img src="${chrome.runtime.getURL("icons/icon.png")}" alt="Icon" width="24" height="24" class="me-2">
+      <h5 class="offcanvas-title fw-bold">
+        ${EXTENSION_SHORT_NAME} 設定
+      </h5>
       <button type="button" class="btn-close" id="mv-close-button" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
@@ -744,7 +745,7 @@ function setupPanelEvents(
         toggleViewBtn.setAttribute("title", "ソースコードを表示 (S)");
       } else {
         toggleViewBtn.innerHTML = ICON_EYE_FILL;
-        toggleViewBtn.setAttribute("title", "プレビューを表示 (P)");
+        toggleViewBtn.setAttribute("title", "プレビューを表示 (S)");
       }
       onViewModeChange(settings.viewMode);
     }
