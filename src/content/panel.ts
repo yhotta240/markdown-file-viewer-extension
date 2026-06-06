@@ -309,12 +309,6 @@ export function buildControlPanel(
           </div>
           <input type="range" class="form-range" min="12" max="24" step="1" id="mv-font-size-slider" value="16">
         </div>
-
-        <!-- 通知のオンオフ -->
-        <div class="form-check form-switch mt-3">
-          <input class="form-check-input" type="checkbox" role="switch" id="mv-settings-notifications" checked>
-          <label class="form-check-label small fw-medium text-secondary" for="mv-settings-notifications">通知を有効にする</label>
-        </div>
       </div>
 
       <hr class="my-4 text-muted">
@@ -621,7 +615,6 @@ function setupPanelEvents(
   const themeRadios = offcanvas.querySelectorAll<HTMLInputElement>('input[name="mv-theme"]');
   const fontSizeSlider = offcanvas.querySelector("#mv-font-size-slider") as HTMLInputElement;
   const fontSizeBadge = offcanvas.querySelector("#mv-font-size-badge") as HTMLElement;
-  const notifyCheckbox = offcanvas.querySelector("#mv-settings-notifications") as HTMLInputElement;
   const fontSelect = offcanvas.querySelector("#mv-font-family-select") as HTMLSelectElement;
 
   // カスタムカラーピッカー関連
@@ -754,11 +747,6 @@ function setupPanelEvents(
       fontSizeSlider.value = String(settings.fontSize);
       fontSizeBadge.textContent = `${settings.fontSize}px`;
       previewArea.style.fontSize = `${settings.fontSize}px`;
-    }
-
-    // 6. 通知設定の適用
-    if (settings.notifications !== undefined) {
-      notifyCheckbox.checked = settings.notifications;
     }
 
     // 7. TTS 設定の適用
@@ -1081,12 +1069,6 @@ function setupPanelEvents(
   fontSizeSlider.addEventListener("change", (e) => {
     const value = Number((e.target as HTMLInputElement).value);
     saveAndApply({ fontSize: value });
-  });
-
-  // 通知設定
-  notifyCheckbox.addEventListener("change", (e) => {
-    const checked = (e.target as HTMLInputElement).checked;
-    saveAndApply({ notifications: checked });
   });
 
   // TTS ボイス変更
