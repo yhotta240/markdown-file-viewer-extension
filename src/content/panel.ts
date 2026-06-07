@@ -12,6 +12,7 @@ import { clearLogs, getLogs, logError } from "../utils/logger";
 import { getSettings, setSettings } from "../utils/storage";
 import { exportMarkdown, exportPdf, exportRawHtml, exportStyledHtml } from "./export";
 import { type MarkdownFileInfo, renderFileInfoPopover } from "./file-info";
+import { renderHistorySection, setupHistorySection } from "./history";
 import {
   getVoices,
   isSpeaking,
@@ -411,6 +412,11 @@ export function buildControlPanel(
 
       <hr class="my-4 text-muted">
 
+      <!-- 2.5. 最近開いたファイル -->
+      ${renderHistorySection()}
+
+      <hr class="my-4 text-muted">
+
       <!-- 3. ドキュメント -->
       <div class="mb-4">
         <h6 class="fw-bold mb-3 small text-uppercase tracking-wider text-muted">ドキュメント</h6>
@@ -510,12 +516,14 @@ function setupPanelEvents(
 
   const logsDetails = offcanvas.querySelector("#mv-logs-details") as HTMLDetailsElement;
   const logsContainer = offcanvas.querySelector("#mv-logs-container") as HTMLElement;
+  const updateHistoryDisplay = setupHistorySection(offcanvas);
 
   // 開閉ロジック
   const openPanel = () => {
     offcanvas.classList.add("show");
     backdrop.style.display = "block";
     setTimeout(() => backdrop.classList.add("show"), 10);
+    updateHistoryDisplay();
     if (logsDetails?.open) {
       updateLogDisplay(logsContainer);
     }

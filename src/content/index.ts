@@ -2,6 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./style.css";
 import "./code-theme.css";
 
+import { recordHistoryItem } from "../utils/history";
 import { logError, logInfo } from "../utils/logger";
 import { isEnabled } from "../utils/storage";
 import { collectMarkdownFileInfo } from "./file-info";
@@ -78,6 +79,14 @@ async function init() {
   // 目次 (TOC) の自動生成と構築
   buildTOC(previewArea, appRoot);
   const fileInfo = collectMarkdownFileInfo(markdownText, previewArea);
+  recordHistoryItem({
+    url: fileInfo.url,
+    title: document.title || fileInfo.fileName,
+    fileName: fileInfo.fileName,
+    locationType: fileInfo.locationType,
+  }).catch((err) => {
+    logError("履歴の保存に失敗しました", "content", err);
+  });
 
   // 表示モード (プレビュー / ソースコード) の切り替え処理
   const onViewModeChange = (mode: "preview" | "source") => {
