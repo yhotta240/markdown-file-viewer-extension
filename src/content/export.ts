@@ -1,4 +1,23 @@
 import { logError } from "../utils/logger";
+import { setStorage } from "../utils/storage";
+
+const PRINT_JOB_KEY_PREFIX = "printJob:";
+
+type PrintJob = {
+  title: string;
+  htmlContent: string;
+  createdAt: number;
+};
+
+type OpenPrintPageMessage = {
+  type: "mv-open-print-page";
+  url: string;
+};
+
+type OpenPrintPageResponse = {
+  ok: boolean;
+  error?: string;
+};
 
 function downloadFile(content: string, contentType: string, filename: string): void {
   const blob = new Blob([content], { type: contentType });
@@ -12,8 +31,43 @@ function downloadFile(content: string, contentType: string, filename: string): v
   URL.revokeObjectURL(url);
 }
 
-export function exportPdf(): void {
-  window.print();
+function createPrintJobId(): string {
+  return crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function sendOpenPrintPageMessage(url: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const message: OpenPrintPageMessage = { type: "mv-open-print-page", url };
+    chrome.runtime.sendMessage(message, (response: OpenPrintPageResponse | undefined) => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+        return;
+      }
+      if (!response?.ok) {
+        reject(new Error(response?.error ?? "印刷ページを開けませんでした"));
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
+export async function exportPdf(htmlContent: string, title: string): Promise<void> {
+  try {
+    const id = createPrintJobId();
+    const printJob: PrintJob = {
+      title,
+      htmlContent,
+      createdAt: Date.now(),
+    };
+
+    await setStorage({ [`${PRINT_JOB_KEY_PREFIX}${id}`]: printJob });
+    await sendOpenPrintPageMessage(
+      chrome.runtime.getURL(`print.html?id=${encodeURIComponent(id)}`),
+    );
+  } catch (error) {
+    logError("印刷ページを開けませんでした:", "content", error);
+  }
 }
 
 export function exportMarkdown(markdownText: string, filename: string): void {

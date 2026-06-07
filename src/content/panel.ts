@@ -481,6 +481,7 @@ export function buildControlPanel(
     appRoot,
     previewArea,
     markdownText,
+    fileInfo,
     onViewModeChange,
   );
 }
@@ -503,6 +504,7 @@ function setupPanelEvents(
   appRoot: HTMLElement,
   previewArea: HTMLElement,
   markdownText: string,
+  fileInfo: MarkdownFileInfo,
   onViewModeChange: (mode: "preview" | "source") => void,
 ): void {
   const gearBtn = toolbar.querySelector("#mv-gear-button") as HTMLElement;
@@ -550,6 +552,17 @@ function setupPanelEvents(
     }
   });
 
+  const printPreview = () => {
+    if (fileInfo.locationType === "local") {
+      window.print();
+      return;
+    }
+
+    const previewRender = document.getElementById("mv-preview-render");
+    if (!previewRender) return;
+    exportPdf(previewRender.innerHTML, document.title || "Markdown Preview");
+  };
+
   // キーボードショートカット
   document.addEventListener("keydown", (e: KeyboardEvent) => {
     if (e.key === "Escape") {
@@ -562,13 +575,13 @@ function setupPanelEvents(
       }
     } else if ((e.key === "p" || e.key === "P") && document.activeElement === document.body) {
       e.preventDefault();
-      window.print();
+      printPreview();
     }
   });
 
   // 印刷ボタン
   printBtn.addEventListener("click", () => {
-    window.print();
+    printPreview();
   });
 
   // ファイル情報ポップアップ表示・非表示制御 (ホバー & クリック)
@@ -641,7 +654,7 @@ function setupPanelEvents(
 
   // 各エクスポートアクションのバインド
   exportPopover.querySelector("#mv-export-pdf")?.addEventListener("click", () => {
-    exportPdf();
+    printPreview();
     exportPopover.classList.remove("show");
   });
 

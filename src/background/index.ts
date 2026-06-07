@@ -5,6 +5,16 @@ import { isEnabled, setEnabled } from "../utils/storage";
 
 const targetMdUrls = ["file:///*/*.md", "file:///*/*.markdown"];
 
+type OpenPrintPageMessage = {
+  type: "mv-open-print-page";
+  url: string;
+};
+
+type OpenPrintPageResponse = {
+  ok: boolean;
+  error?: string;
+};
+
 async function updateBadgeState() {
   const enabled = await isEnabled();
   chrome.action.setIcon({
@@ -39,3 +49,23 @@ chrome.action.onClicked.addListener(async () => {
   await updateBadgeState();
   await reloadTargetTabs(targetMdUrls);
 });
+
+chrome.runtime.onMessage.addListener(
+  (
+    message: OpenPrintPageMessage,
+    _sender,
+    sendResponse: (response: OpenPrintPageResponse) => void,
+  ) => {
+    if (message?.type !== "mv-open-print-page") return;
+
+    chrome.tabs.create({ url: message.url }, () => {
+      if (chrome.runtime.lastError) {
+        sendResponse({ ok: false, error: chrome.runtime.lastError.message });
+        return;
+      }
+      sendResponse({ ok: true });
+    });
+
+    return true;
+  },
+);
