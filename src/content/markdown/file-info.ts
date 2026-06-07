@@ -1,4 +1,4 @@
-import { escapeHtml } from "../utils/html";
+import { escapeHtml } from "../../utils/html";
 
 type FrontMatterValue = string | number | boolean;
 

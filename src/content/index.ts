@@ -1,5 +1,5 @@
 import { logError } from "../utils/logger";
-import { getMarkdownText } from "./preview";
+import { getMarkdownText } from "./markdown/preview";
 
 type MarkdownViewerApp = typeof import("./app");
 

@@ -1,0 +1,17 @@
+export const ICONS = {
+  clipboard: `<i class="bi bi-clipboard"></i>`,
+  clipboardCheck: `<i class="bi bi-clipboard-check-fill text-success"></i>`,
+  code: `<i class="bi bi-code-slash"></i>`,
+  export: `<i class="bi bi-box-arrow-up"></i>`,
+  eye: `<i class="bi bi-eye-fill"></i>`,
+  filetypePdf: `<i class="bi bi-file-earmark-pdf"></i>`,
+  info: `<i class="bi bi-info-circle"></i>`,
+  markdown: `<i class="bi bi-markdown"></i>`,
+  pause: `<i class="bi bi-pause-fill"></i>`,
+  play: `<i class="bi bi-play-fill"></i>`,
+  printer: `<i class="bi bi-printer"></i>`,
+  rawHtml: `<i class="bi bi-filetype-html"></i>`,
+  sliders: `<i class="bi bi-sliders"></i>`,
+  stop: `<i class="bi bi-stop-fill"></i>`,
+  styledHtml: `<i class="bi bi-link-45deg"></i>`,
+} as const;

@@ -1,6 +1,6 @@
-import { clearHistoryItems, getHistoryItems, type HistoryItem } from "../utils/history";
-import { escapeHtml } from "../utils/html";
-import { logError } from "../utils/logger";
+import { clearHistoryItems, getHistoryItems, type HistoryItem } from "../../utils/history";
+import { escapeHtml } from "../../utils/html";
+import { logError } from "../../utils/logger";
 
 const historyDateFormatter = new Intl.DateTimeFormat("ja-JP", {
   year: "numeric",

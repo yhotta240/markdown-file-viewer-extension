@@ -1,4 +1,4 @@
-import { logWarn } from "../utils/logger";
+import { logWarn } from "../../utils/logger";
 
 /** Web Speech API (SpeechSynthesis) を使ったローカル完結の読み上げモジュール */
 export type TTSOptions = {

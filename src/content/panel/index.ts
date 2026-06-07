@@ -1,18 +1,16 @@
-import privacyDoc from "../../docs/privacy.md";
-import shortcutsDoc from "../../docs/shortcuts.md";
-import usageDoc from "../../docs/usage.md";
+import privacyDoc from "../../../docs/privacy.md";
+import shortcutsDoc from "../../../docs/shortcuts.md";
+import usageDoc from "../../../docs/usage.md";
 import {
   DEFAULT_SETTINGS,
   EXTENSION_SHORT_NAME,
   EXTENSION_VERSION,
   type Settings,
-} from "../settings";
-import { escapeHtml } from "../utils/html";
-import { clearLogs, getLogs, logError } from "../utils/logger";
-import { getSettings, setSettings } from "../utils/storage";
-import { exportMarkdown, exportPdf, exportRawHtml, exportStyledHtml } from "./export";
-import { type MarkdownFileInfo, renderFileInfoPopover } from "./file-info";
-import { renderHistorySection, setupHistorySection } from "./history";
+} from "../../settings";
+import { escapeHtml } from "../../utils/html";
+import { clearLogs, logError } from "../../utils/logger";
+import { getSettings, setSettings } from "../../utils/storage";
+import { exportMarkdown, exportPdf, exportRawHtml, exportStyledHtml } from "../actions/export";
 import {
   getVoices,
   isSpeaking,
@@ -21,98 +19,14 @@ import {
   isPaused as ttsPaused,
   resume as ttsResume,
   stop as ttsStop,
-} from "./tts";
-
-const ICON_EYE_FILL = `<i class="bi bi-eye-fill"></i>`;
-
-const ICON_CLIPBOARD = `<i class="bi bi-clipboard"></i>`;
-
-const ICON_CLIPBOARD_CHECK = `<i class="bi bi-clipboard-check-fill text-success"></i>`;
-
-const ICON_CODE_SLASH = `<i class="bi bi-code-slash"></i>`;
-
-const ICON_PRINTER = `<i class="bi bi-printer"></i>`;
-
-const ICON_EXPORT = `<i class="bi bi-box-arrow-up"></i>`;
-
-const ICON_PLAY = `<i class="bi bi-play-fill"></i>`;
-
-const ICON_PAUSE = `<i class="bi bi-pause-fill"></i>`;
-
-const ICON_STOP = `<i class="bi bi-stop-fill"></i>`;
-
-const ICON_SLIDERS = `<i class="bi bi-sliders"></i>`;
-
-const ICON_FILETYPE_PDF = `<i class="bi bi-file-earmark-pdf"></i>`;
-
-const ICON_STYLED_HTML = `<i class="bi bi-link-45deg"></i>`;
-
-const ICON_RAW_HTML = `<i class="bi bi-filetype-html"></i>`;
-
-const ICON_MARKDOWN = `<i class="bi bi-markdown"></i>`;
-
-const ICON_INFO = `<i class="bi bi-info-circle"></i>`;
-
-/**
- * カラーのYIQ明度計算による明暗判定 (背景色が暗い場合に文字色を白にするトグル用)
- */
-function isColorDark(hex: string): boolean {
-  const color = hex.replace("#", "");
-  if (color.length !== 6) return false;
-  const r = parseInt(color.substring(0, 2), 16);
-  const g = parseInt(color.substring(2, 4), 16);
-  const b = parseInt(color.substring(4, 6), 16);
-  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-  return yiq < 128;
-}
-
-/**
- * 動的に Google Fonts をロードし、CSS変数にフォントを適用する
- */
-function applyFontFamily(fontKey: string, appRoot: HTMLElement): void {
-  const existingLink = document.getElementById("mv-dynamic-font");
-  if (existingLink) {
-    existingLink.remove();
-  }
-
-  let fontCss = "";
-  let fontUrl = "";
-
-  switch (fontKey) {
-    case "inter":
-      fontCss = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-      fontUrl =
-        "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap";
-      break;
-    case "outfit":
-      fontCss = '"Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-      fontUrl =
-        "https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap";
-      break;
-    case "notosansjp":
-      fontCss = '"Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-      fontUrl =
-        "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap";
-      break;
-    case "serif":
-      fontCss = 'Georgia, Cambria, "Times New Roman", "Noto Serif JP", serif';
-      fontUrl = "https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap";
-      break;
-    default:
-      fontCss = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      break;
-  }
-
-  if (fontUrl) {
-    const link = document.createElement("link");
-    link.id = "mv-dynamic-font";
-    link.rel = "stylesheet";
-    link.href = fontUrl;
-    document.head.appendChild(link);
-  }
-
-  appRoot.style.setProperty("--mv-font-family", fontCss);
-}
+} from "../actions/tts";
+import { type MarkdownFileInfo, renderFileInfoPopover } from "../markdown/file-info";
+import { renderHistorySection, setupHistorySection } from "./history";
+import { getSafeFilename } from "./ui/filename";
+import { ICONS } from "./ui/icons";
+import { updateLogDisplay } from "./ui/log-view";
+import { bindHoverPopover } from "./ui/popover";
+import { applyFontFamily, isColorDark } from "./ui/theme";
 
 /**
  * コントロールパネル (Offcanvas) とドッキング型ツールバーを構築する
@@ -153,70 +67,70 @@ export function buildControlPanel(
   toolbar.innerHTML = `
     <!-- 表示モード切替トグルボタン -->
     <button type="button" class="mv-toolbar-btn" id="mv-toggle-view" title="ソースコードを表示 (S)">
-      ${ICON_CODE_SLASH}
+      ${ICONS.code}
     </button>
     
     <div class="mv-toolbar-divider"></div>
     
     <!-- マークダウンコピー -->
     <button type="button" class="mv-toolbar-btn" id="mv-copy-button" title="Markdownをコピー">
-      ${ICON_CLIPBOARD}
+      ${ICONS.clipboard}
     </button>
     
     <div class="mv-toolbar-divider"></div>
     
     <!-- 印刷 -->
     <button type="button" class="mv-toolbar-btn" id="mv-print-button" title="印刷する (P)">
-      ${ICON_PRINTER}
+      ${ICONS.printer}
     </button>
     
     <div class="mv-toolbar-divider"></div>
 
     <!-- 読み上げ -->
     <button type="button" class="mv-toolbar-btn" id="mv-tts-button" title="読み上げ (R)">
-      ${ICON_PLAY}
+      ${ICONS.play}
     </button>
     <button type="button" class="mv-toolbar-btn" id="mv-tts-stop-button" title="停止" style="display: none;">
-      ${ICON_STOP}
+      ${ICONS.stop}
     </button>
     
     <div class="mv-toolbar-divider"></div>
     
     <!-- エクスポート -->
     <button type="button" class="mv-toolbar-btn" id="mv-export-button" title="エクスポート">
-    ${ICON_EXPORT}
+    ${ICONS.export}
     </button>
 
     <div class="mv-toolbar-divider"></div>
 
     <!-- ファイル情報 -->
     <button type="button" class="mv-toolbar-btn" id="mv-file-info-button" title="ファイル情報" aria-describedby="mv-file-info-popover">
-      ${ICON_INFO}
+      ${ICONS.info}
     </button>
     
     <div class="mv-toolbar-divider"></div>
     
     <!-- 設定を開く -->
     <button type="button" class="mv-toolbar-btn" id="mv-gear-button" title="設定を開く (T)">
-      ${ICON_SLIDERS}
+      ${ICONS.sliders}
     </button>
 
     <!-- エクスポートポップアップメニュー -->
     <div class="mv-export-popover" id="mv-export-popover">
       <button type="button" class="mv-export-item" id="mv-export-pdf">
-        ${ICON_FILETYPE_PDF}
+        ${ICONS.filetypePdf}
         <span>PDF</span>
       </button>
       <button type="button" class="mv-export-item" id="mv-export-styled-html">
-        ${ICON_STYLED_HTML}
+        ${ICONS.styledHtml}
         <span>Styled HTML</span>
       </button>
       <button type="button" class="mv-export-item" id="mv-export-raw-html">
-        ${ICON_RAW_HTML}
+        ${ICONS.rawHtml}
         <span>Raw HTML</span>
       </button>
       <button type="button" class="mv-export-item" id="mv-export-md">
-        ${ICON_MARKDOWN}
+        ${ICONS.markdown}
         <span>Markdown</span>
       </button>
     </div>
@@ -486,17 +400,6 @@ export function buildControlPanel(
   );
 }
 
-// 安全なファイル名を作成するヘルパー
-function getSafeFilename(title: string): string {
-  let name = title;
-  if (name.toLowerCase().endsWith(".md")) {
-    name = name.slice(0, -3);
-  } else if (name.toLowerCase().endsWith(".markdown")) {
-    name = name.slice(0, -9);
-  }
-  return name.replace(/[\\/:*?"<>|]/g, "_").trim() || "document";
-}
-
 function setupPanelEvents(
   offcanvas: HTMLElement,
   backdrop: HTMLElement,
@@ -584,73 +487,8 @@ function setupPanelEvents(
     printPreview();
   });
 
-  // ファイル情報ポップアップ表示・非表示制御 (ホバー & クリック)
-  let fileInfoPopoverTimeout: number | null = null;
-  const showFileInfoPopover = () => {
-    if (fileInfoPopoverTimeout) {
-      clearTimeout(fileInfoPopoverTimeout);
-      fileInfoPopoverTimeout = null;
-    }
-    fileInfoPopover.classList.add("show");
-  };
-
-  const hideFileInfoPopover = () => {
-    fileInfoPopoverTimeout = window.setTimeout(() => {
-      fileInfoPopover.classList.remove("show");
-    }, 150);
-  };
-
-  fileInfoBtn.addEventListener("mouseenter", showFileInfoPopover);
-  fileInfoBtn.addEventListener("mouseleave", hideFileInfoPopover);
-  fileInfoPopover.addEventListener("mouseenter", showFileInfoPopover);
-  fileInfoPopover.addEventListener("mouseleave", hideFileInfoPopover);
-
-  fileInfoBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    fileInfoPopover.classList.toggle("show");
-  });
-
-  document.addEventListener("click", () => {
-    fileInfoPopover.classList.remove("show");
-  });
-
-  fileInfoPopover.addEventListener("click", (e) => {
-    e.stopPropagation();
-  });
-
-  // エクスポートメニューのポップアップ表示・非表示制御 (ホバー & クリック)
-  let popoverTimeout: number | null = null;
-  const showPopover = () => {
-    if (popoverTimeout) {
-      clearTimeout(popoverTimeout);
-      popoverTimeout = null;
-    }
-    exportPopover.classList.add("show");
-  };
-
-  const hidePopover = () => {
-    popoverTimeout = window.setTimeout(() => {
-      exportPopover.classList.remove("show");
-    }, 150);
-  };
-
-  exportBtn.addEventListener("mouseenter", showPopover);
-  exportBtn.addEventListener("mouseleave", hidePopover);
-  exportPopover.addEventListener("mouseenter", showPopover);
-  exportPopover.addEventListener("mouseleave", hidePopover);
-
-  exportBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    exportPopover.classList.toggle("show");
-  });
-
-  document.addEventListener("click", () => {
-    exportPopover.classList.remove("show");
-  });
-
-  exportPopover.addEventListener("click", (e) => {
-    e.stopPropagation();
-  });
+  bindHoverPopover({ trigger: fileInfoBtn, popover: fileInfoPopover });
+  bindHoverPopover({ trigger: exportBtn, popover: exportPopover });
 
   // 各エクスポートアクションのバインド
   exportPopover.querySelector("#mv-export-pdf")?.addEventListener("click", () => {
@@ -690,11 +528,11 @@ function setupPanelEvents(
     navigator.clipboard
       .writeText(markdownText)
       .then(() => {
-        copyBtn.innerHTML = ICON_CLIPBOARD_CHECK;
+        copyBtn.innerHTML = ICONS.clipboardCheck;
         copyBtn.setAttribute("title", "コピーしました！");
 
         setTimeout(() => {
-          copyBtn.innerHTML = ICON_CLIPBOARD;
+          copyBtn.innerHTML = ICONS.clipboard;
           copyBtn.setAttribute("title", "Markdownをコピー");
         }, 2000);
       })
@@ -762,10 +600,10 @@ function setupPanelEvents(
     // 1. 表示モードの適用
     if (settings.viewMode) {
       if (settings.viewMode === "preview") {
-        toggleViewBtn.innerHTML = ICON_CODE_SLASH;
+        toggleViewBtn.innerHTML = ICONS.code;
         toggleViewBtn.setAttribute("title", "ソースコードを表示 (S)");
       } else {
-        toggleViewBtn.innerHTML = ICON_EYE_FILL;
+        toggleViewBtn.innerHTML = ICONS.eye;
         toggleViewBtn.setAttribute("title", "プレビューを表示 (S)");
       }
       onViewModeChange(settings.viewMode);
@@ -911,15 +749,15 @@ function setupPanelEvents(
     const speaking = isSpeaking();
     const paused = ttsPaused();
     if (speaking) {
-      ttsBtn.innerHTML = ICON_PAUSE;
+      ttsBtn.innerHTML = ICONS.pause;
       ttsBtn.setAttribute("title", "一時停止 (R)");
       ttsStopBtn.style.display = "inline-flex";
     } else if (paused) {
-      ttsBtn.innerHTML = ICON_PLAY;
+      ttsBtn.innerHTML = ICONS.play;
       ttsBtn.setAttribute("title", "再開 (R)");
       ttsStopBtn.style.display = "inline-flex";
     } else {
-      ttsBtn.innerHTML = ICON_PLAY;
+      ttsBtn.innerHTML = ICONS.play;
       ttsBtn.setAttribute("title", "読み上げ (R)");
       ttsStopBtn.style.display = "none";
     }
@@ -1280,45 +1118,5 @@ function setupPanelEvents(
       .catch((err) => {
         logError("URLコピーに失敗しました", "content", err);
       });
-  });
-}
-
-/**
- * ログ表示の最新化
- */
-function updateLogDisplay(container: HTMLElement): void {
-  getLogs().then((logs) => {
-    container.innerHTML = "";
-    if (logs.length === 0) {
-      container.innerHTML = '<div class="text-muted small text-center py-3">ログはありません</div>';
-      return;
-    }
-
-    const logList = document.createElement("div");
-    logList.className = "d-flex flex-column gap-1";
-
-    logs
-      .slice()
-      .reverse()
-      .forEach((log) => {
-        const item = document.createElement("div");
-        item.className = "p-1 rounded font-monospace small border-bottom border-light-subtle";
-        item.style.fontSize = "11px";
-        item.style.lineHeight = "1.4";
-
-        let badgeColor = "bg-secondary-subtle text-secondary-emphasis";
-        if (log.level === "warn") badgeColor = "bg-warning-subtle text-warning-emphasis";
-        if (log.level === "error") badgeColor = "bg-danger-subtle text-danger-emphasis";
-
-        item.innerHTML = `
-        <div class="d-flex justify-content-between text-muted" style="font-size: 10px;">
-          <span>[${log.timestamp}]</span>
-          <span class="badge ${badgeColor}">${log.level.toUpperCase()} / ${log.source}</span>
-        </div>
-        <div class="text-break mt-1">${escapeHtml(log.message)}</div>
-      `;
-        logList.appendChild(item);
-      });
-    container.appendChild(logList);
   });
 }

@@ -17,7 +17,7 @@ import typescript from "highlight.js/lib/languages/typescript";
 import xml from "highlight.js/lib/languages/xml";
 import yaml from "highlight.js/lib/languages/yaml";
 import { marked } from "marked";
-import { logError, logWarn } from "../utils/logger";
+import { logError, logWarn } from "../../utils/logger";
 
 hljs.registerLanguage("bash", bash);
 hljs.registerLanguage("css", css);

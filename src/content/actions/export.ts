@@ -1,5 +1,5 @@
-import { logError } from "../utils/logger";
-import { setStorage } from "../utils/storage";
+import { logError } from "../../utils/logger";
+import { setStorage } from "../../utils/storage";
 
 const PRINT_JOB_KEY_PREFIX = "printJob:";
 

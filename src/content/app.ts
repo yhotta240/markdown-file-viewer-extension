@@ -1,14 +1,14 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./style.css";
-import "./code-theme.css";
+import "./styles/style.css";
+import "./styles/code-theme.css";
 
 import { recordHistoryItem } from "../utils/history";
 import { logError, logInfo } from "../utils/logger";
 import { isEnabled } from "../utils/storage";
-import { collectMarkdownFileInfo } from "./file-info";
+import { collectMarkdownFileInfo } from "./markdown/file-info";
+import { hideRawContent, renderPreview, setFavicon } from "./markdown/preview";
+import { buildTOC } from "./markdown/toc";
 import { buildControlPanel } from "./panel";
-import { hideRawContent, renderPreview, setFavicon } from "./preview";
-import { buildTOC } from "./toc";
 
 function revealDocument(): void {
   document.documentElement.style.opacity = "";
