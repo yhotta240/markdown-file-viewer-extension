@@ -16,9 +16,11 @@ class ExtensionReloader {
   constructor(port = 6571) {
     this.port = port
     this._ownsServer = false
+    this._disabled = false
 
     if (!WebSocket) {
       this.wss = { clients: [] }
+      this._disabled = true
       return
     }
 
@@ -34,13 +36,23 @@ class ExtensionReloader {
         this._ownsServer = true
         global.__EXT_RELOADER_WSS = { instance: this.wss, port: this.port }
         this.wss.on("error", (err) => {
-          // EADDRINUSE 等のエラーが来る可能性がある — ログに残す
-          console.warn(`ext-reloader: WebSocket server error on port ${this.port}:`, err && err.code ? err.code : err)
+          const code = err && err.code ? err.code : err
+          if (code === "EADDRINUSE") {
+            console.warn(`ext-reloader: ポート ${this.port} は使用中のためオートリロードを無効化します．`)
+          } else {
+            console.warn(`ext-reloader: WebSocket server error on port ${this.port}:`, code)
+          }
+          this._disabled = true
+          this._ownsServer = false
+          this.wss = { clients: [] }
+          if (global.__EXT_RELOADER_WSS && global.__EXT_RELOADER_WSS.port === this.port) {
+            delete global.__EXT_RELOADER_WSS
+          }
         })
       } catch (err) {
-        // ポート使用中などでサーバを作れない場合は安全にフォールバック
         console.warn(`ext-reloader: WebSocket サーバの作成に失敗しました（ポート ${this.port}）:`, err && err.code ? err.code : err)
         this.wss = { clients: [] }
+        this._disabled = true
         this._ownsServer = false
       }
     }
@@ -49,6 +61,7 @@ class ExtensionReloader {
   apply(compiler) {
     // ビルド後に接続中クライアントへ reload を送る
     compiler.hooks.afterEmit.tap("ExtensionReloader", () => {
+      if (this._disabled) return
       for (const client of this.wss.clients) {
         try {
           if (WebSocket && client.readyState === WebSocket.OPEN) {

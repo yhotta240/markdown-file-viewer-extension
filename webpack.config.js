@@ -3,6 +3,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ExtensionReloader = require("./scripts/ext-reloader");
 
 const isDev = process.env.NODE_ENV !== "production";
+const isWatch = process.argv.includes("--watch") || process.argv.includes("-w");
 
 // パス設定
 const ROOT = __dirname; // プロジェクトルート
@@ -96,7 +97,7 @@ module.exports = {
         ]
       })
     ];
-    if (isDev) {
+    if (isDev && isWatch) {
       plugins.unshift(new ExtensionReloader());
     }
     return plugins;
