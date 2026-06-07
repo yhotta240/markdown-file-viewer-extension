@@ -41,6 +41,10 @@ hljs.registerAliases(["ts", "tsx"], { languageName: "typescript" });
 hljs.registerAliases(["html", "xhtml", "svg"], { languageName: "xml" });
 hljs.registerAliases(["yml"], { languageName: "yaml" });
 
+function stripFrontMatter(markdownText: string): string {
+  return markdownText.replace(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/, "");
+}
+
 /**
  * ページ内の pre 要素からマークダウンテキストを抽出する
  */
@@ -142,7 +146,7 @@ export async function renderPreview(markdownText: string): Promise<HTMLElement> 
   const previewRender = document.createElement("div");
   previewRender.id = "mv-preview-render";
 
-  const parsedHtml = await marked.parse(markdownText);
+  const parsedHtml = await marked.parse(stripFrontMatter(markdownText));
   previewRender.innerHTML = parsedHtml;
 
   // コードブロックに言語別シンタックスハイライトを適用
