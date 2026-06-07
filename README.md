@@ -1,59 +1,48 @@
 # Markdown File Viewer
 
-ブラウザで Markdown ファイルを快適に閲覧するための Chrome 拡張機能です。シンプルな UI と豊富な機能で、Markdown ファイルの内容を見やすく整理し、必要な情報に素早くアクセスできます。
+Markdown File Viewer は，ローカルまたは Web 上の Markdown ファイルをブラウザで読みやすく表示する拡張機能です．ファイルを開くだけでプレビューに切り替わり，目次，表示設定，エクスポートをすぐに使えます．
 
 ## 主な機能
 
-- Markdown の自動検出とリッチプレビュー
-- 目次（TOC）の自動生成とスクロール同期
-- プレビュー／ソース表示の切り替え
-- テーマ・フォント・表示幅のカスタマイズ
-- Markdown・HTML・PDF へのエクスポート
-- 印刷，URL共有，クリップボードコピー
-
-## インストール
-
-### Chrome Web Store からインストール
-
-準備中...
-
-### 手動インストール
-
-必要条件
-
-- [Node.js](https://nodejs.org/) (v18.x 以上を推奨)
-- [npm](https://www.npmjs.com/) または [yarn](https://yarnpkg.com/)
-
-手順
-
-1. このリポジトリをクローン
-
-   ```bash
-   git clone https://github.com/yhotta240/markdown-file-viewer-extension
-   cd markdown-file-viewer-extension
-   ```
-
-2. 依存関係をインストール
-
-   ```bash
-   npm install
-   ```
-
-3. ビルド
-
-   ```bash
-   npm run build
-   ```
-
-4. Chrome に読み込む
-   - Chrome で `chrome://extensions/` を開く
-   - 「デベロッパーモード」をオンにする
-   - 「パッケージ化されていない拡張機能を読み込む」をクリック
-   - `dist/` ディレクトリを選択
+- `.md`，`.markdown` ファイルの自動プレビュー
+- 見出しから目次を生成し，スクロール位置に追従
+- プレビュー表示とソース表示の切り替え
+- テーマ，フォント，最大横幅，コードテーマの調整
+- Markdown，HTML，PDF へのエクスポート
+- 印刷，コピー，URL共有，最近開いたファイルの表示
+- ブラウザの音声合成を使った読み上げ
 
 ## 使い方
 
-[使い方](docs/usage.md) を参照してください
+1. ブラウザで Markdown ファイルを開きます．
+2. 自動でプレビューが表示されます．
+3. 右下のツールバーから表示切り替え，コピー，印刷，読み上げ，エクスポート，設定を操作します．
+4. 設定パネルで表示幅，テーマ，フォントなどを調整します．
+
+詳しくは [使い方](docs/usage.md) と [キーボードショートカット](docs/shortcuts.md) を参照してください．
+
+## インストール
+
+### Chrome Web Store
+
+準備中です．
+
+### 手動インストール
+
+必要なものは Node.js 18 以上と npm です．
+
+```bash
+git clone https://github.com/yhotta240/markdown-file-viewer-extension
+cd markdown-file-viewer-extension
+npm install
+npm run build
+```
+
+ブラウザの拡張機能ページ（`chrome://extensions/`）を開き，デベロッパーモードを有効にして，`dist/` を読み込んでください．
+
+## プライバシー
+
+Markdown の解析と表示はブラウザ内で行います．拡張機能がファイル本文，設定，閲覧履歴を外部サーバーへ送信することはありません．詳しくは [プライバシーポリシー](docs/privacy.md) を参照してください．
 
 ## ライセンス
 
@@ -61,4 +50,4 @@ MIT License
 
 ## 作者
 
-- yhotta240 (https://github.com/yhotta240)
+yhotta240

@@ -7,7 +7,7 @@ import {
   EXTENSION_VERSION,
   type Settings,
 } from "../../settings";
-import { escapeHtml } from "../../utils/html";
+import { applyMarkdownClassMap, escapeHtml } from "../../utils/html";
 import { clearLogs, logError } from "../../utils/logger";
 import { getSettings, setSettings } from "../../utils/storage";
 import { exportMarkdown, exportPdf, exportRawHtml, exportStyledHtml } from "../actions/export";
@@ -27,6 +27,11 @@ import { ICONS } from "./ui/icons";
 import { updateLogDisplay } from "./ui/log-view";
 import { bindHoverPopover } from "./ui/popover";
 import { applyFontFamily, isColorDark } from "./ui/theme";
+
+const MARKDOWN_CLASS_MAP: Record<string, string> = {
+  h1: "fs-5",
+  h2: "fs-6",
+};
 
 /**
  * コントロールパネル (Offcanvas) とドッキング型ツールバーを構築する
@@ -48,11 +53,11 @@ export function buildControlPanel(
       const expandedAttr = doc.metadata.expanded ? "open" : "";
       return `
         <details class="mv-doc-details border rounded p-2 mb-2 bg-body-tertiary" ${expandedAttr}>
-          <summary class="fw-semibold text-secondary small" style="cursor: pointer; user-select: none;">${escapeHtml(
-            doc.metadata.title,
-          )}</summary>
+          <summary class="fw-semibold text-secondary small" style="cursor: pointer; user-select: none;">
+            ${escapeHtml(doc.metadata.title)}
+          </summary>
           <div class="mt-2 small text-muted">
-            ${doc.content}
+            ${applyMarkdownClassMap(MARKDOWN_CLASS_MAP, doc.content)}
           </div>
         </details>
       `;
