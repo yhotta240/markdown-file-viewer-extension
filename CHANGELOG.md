@@ -1,13 +1,24 @@
-<!--
-リリースは H2 見出し（##）で区切ってください。
-フォーマットは Keep a Changelog 準拠を推奨します。
--->
-
 # Changelog
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.2.0] - 2026-06-07
+
+### Added
+
+- 最近開いたファイル履歴を追加
+
+### Changed
+
+- Web Markdown の印刷を拡張機能ページ経由に変更
+- raw Markdown ページのみプレビューを初期化するように変更
+- content 配下の構成を機能別ディレクトリへ整理
+
+### Fixed
+
+- プレビューから先頭メタ情報を除外
+- watch 時のリローダー起動を安定化
+- 設定パネルのアイコンとショートカット表示を修正
 
 ## [0.1.0] - 2026-06-06
 
