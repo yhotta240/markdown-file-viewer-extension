@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2026-06-07
+
+### Added
+
+- 自動公開するワークフローを追加
+
+### Changed
+
+- READMEとドキュメント表示を更新
+
+### Fixed
+
+- 目次とプレビューのレスポンシブ配置を整理
+
 ## [0.2.0] - 2026-06-07
 
 ### Added
