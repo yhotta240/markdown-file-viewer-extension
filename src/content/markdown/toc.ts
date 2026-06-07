@@ -26,41 +26,40 @@ function setupTocObserver(headings: HTMLElement[], tocItems: HTMLElement[]): voi
 }
 
 /**
- * プレビューコンテナの配置スペースから目次のデスクトップ/ミニインジケーター表示を動的判定する
+ * リーダーレイアウトの配置スペースから目次の通常/ミニ表示を動的判定する
  */
-function updateTocResponsive(tocWrapper: HTMLElement, popup: HTMLElement): void {
-  const container = document.querySelector(".mv-container") as HTMLElement;
-  if (!container) return;
+function updateTocResponsive(
+  tocWrapper: HTMLElement,
+  popup: HTMLElement,
+  readerLayout: HTMLElement,
+): void {
+  if (tocWrapper.style.display === "none") {
+    popup.classList.remove("visible");
+    return;
+  }
 
-  const containerRect = container.getBoundingClientRect();
+  const desktopTocWidth = 240;
+  const layoutMargin = 32;
+  const configuredPreviewWidth = Number.parseFloat(
+    getComputedStyle(readerLayout).getPropertyValue("--mv-preview-width"),
+  );
+  const previewWidth = Number.isFinite(configuredPreviewWidth) ? configuredPreviewWidth : 860;
   const windowWidth = window.innerWidth;
-  const rightSpace = windowWidth - (containerRect.left + containerRect.width);
-  const isMinimized = !(rightSpace >= 260 && windowWidth >= 1100);
+  const fullLayoutWidth = previewWidth + desktopTocWidth;
+  const isMinimized = !(windowWidth >= 1100 && windowWidth >= fullLayoutWidth + layoutMargin * 2);
 
   tocWrapper.classList.toggle("mv-toc-minimized", isMinimized);
-  tocWrapper.style.position = "fixed";
-  tocWrapper.style.right = "";
+  readerLayout.classList.toggle("mv-toc-minimized-layout", isMinimized);
 
   if (!isMinimized) {
-    tocWrapper.style.left = `${containerRect.left + containerRect.width + 30}px`;
-    tocWrapper.style.top = "6rem";
-    tocWrapper.style.transform = "";
     popup.classList.remove("visible");
-  } else {
-    const wrapperW = 56; // CSS #mv-toc-wrapper.mv-toc-minimized の width と合わせる
-    const margin = 10;
-    // コンテナ右端の外側に置けるスペースがあればその位置、なければコンテナ右端に重ねる
-    const idealLeft = containerRect.left + containerRect.width + 8;
-    const clampedLeft = Math.min(idealLeft, windowWidth - wrapperW - margin);
-    tocWrapper.style.left = `${Math.max(margin, clampedLeft)}px`;
-    // top は updateLayout で合計高さ確定後に設定する
   }
 }
 
 /**
  * 目次 (TOC) を構築する
  */
-export function buildTOC(previewArea: HTMLElement, appRoot: HTMLElement): void {
+export function buildTOC(previewArea: HTMLElement, readerLayout: HTMLElement): void {
   // 既存のTOCとポップアップをクリア
   document.getElementById("mv-toc-wrapper")?.remove();
   document.getElementById("mv-toc-mini-popup")?.remove();
@@ -68,6 +67,7 @@ export function buildTOC(previewArea: HTMLElement, appRoot: HTMLElement): void {
   const headings = Array.from(
     previewArea.querySelectorAll("h1, h2, h3, h4, h5, h6"),
   ) as HTMLElement[];
+  readerLayout.classList.toggle("mv-no-toc-layout", headings.length === 0);
   if (headings.length === 0) return;
 
   // TOCコンテナの作成
@@ -100,7 +100,7 @@ export function buildTOC(previewArea: HTMLElement, appRoot: HTMLElement): void {
 
   nav.appendChild(ul);
   tocWrapper.appendChild(nav);
-  appRoot.appendChild(tocWrapper);
+  readerLayout.appendChild(tocWrapper);
 
   // ---- ミニモード用ポップアップ ----
   const popup = document.createElement("div");
@@ -154,12 +154,18 @@ export function buildTOC(previewArea: HTMLElement, appRoot: HTMLElement): void {
     const rect = tocWrapper.getBoundingClientRect();
     const popupH = popup.offsetHeight;
     const margin = 8;
+    const popupW = popup.offsetWidth;
     const clampedTop = Math.min(
       Math.max(margin + popupH / 2, rect.top + rect.height / 2),
       window.innerHeight - margin - popupH / 2,
     );
+    const clampedLeft = Math.min(
+      Math.max(margin, rect.left - popupW - margin),
+      window.innerWidth - popupW - margin,
+    );
     popup.style.top = `${clampedTop}px`;
-    popup.style.right = `${window.innerWidth - rect.left - 10}px`;
+    popup.style.left = `${clampedLeft}px`;
+    popup.style.right = "";
 
     popup.classList.add("visible");
 
@@ -180,6 +186,20 @@ export function buildTOC(previewArea: HTMLElement, appRoot: HTMLElement): void {
   // ホバーで表示、150ms の遅延付きで非表示（インジケーター↔ポップアップ間の隙間を吸収）
   tocWrapper.addEventListener("mouseenter", showPopup);
   tocWrapper.addEventListener("mouseleave", scheduleHide);
+  tocWrapper.addEventListener(
+    "click",
+    (e) => {
+      if (!tocWrapper.classList.contains("mv-toc-minimized")) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (popup.classList.contains("visible")) {
+        hidePopup();
+      } else {
+        showPopup();
+      }
+    },
+    true,
+  );
   popup.addEventListener("mouseenter", cancelHide);
   popup.addEventListener("mouseleave", scheduleHide);
 
@@ -193,7 +213,7 @@ export function buildTOC(previewArea: HTMLElement, appRoot: HTMLElement): void {
   setupTocObserver(headings, tocItems);
 
   const updateLayout = () => {
-    updateTocResponsive(tocWrapper, popup);
+    updateTocResponsive(tocWrapper, popup, readerLayout);
     // ミニモード時: バーの高さと gap を動的計算してはみ出しを防ぐ
     const n = tocItems.length;
     if (tocWrapper.classList.contains("mv-toc-minimized") && n > 0) {
@@ -211,9 +231,12 @@ export function buildTOC(previewArea: HTMLElement, appRoot: HTMLElement): void {
       }
       const totalH = n * itemH + (n > 1 ? (n - 1) * gapPx : 0);
       const idealTop = (window.innerHeight - totalH) / 2;
-      tocWrapper.style.top = `${Math.min(Math.max(margin, idealTop), window.innerHeight - totalH - margin)}px`;
-      tocWrapper.style.transform = "";
+      tocWrapper.style.setProperty(
+        "--mv-toc-mini-top",
+        `${Math.min(Math.max(margin, idealTop), window.innerHeight - totalH - margin)}px`,
+      );
     } else {
+      tocWrapper.style.removeProperty("--mv-toc-mini-top");
       ul.style.gap = "";
       for (const li of tocItems) {
         li.style.height = "";
@@ -223,9 +246,6 @@ export function buildTOC(previewArea: HTMLElement, appRoot: HTMLElement): void {
     }
   };
   window.addEventListener("resize", updateLayout);
-  const maxWidthSlider = document.getElementById("mv-max-width-slider");
-  maxWidthSlider?.addEventListener("input", updateLayout);
-  maxWidthSlider?.addEventListener("change", updateLayout);
 
   requestAnimationFrame(updateLayout);
 }

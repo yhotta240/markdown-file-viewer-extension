@@ -71,19 +71,6 @@ export function hideRawContent(): void {
 }
 
 /**
- * 元のプレーンテキスト表示（preタグ）を再表示する
- * (※現在はセンター内でソース表示するため、基本的には使用されませんが、互換性のために残します)
- */
-export function showRawContent(): void {
-  const pre = document.querySelector("pre");
-  if (pre) {
-    pre.style.display = "";
-  }
-  document.body.style.margin = "";
-  document.body.style.padding = "";
-}
-
-/**
  * パースされたHTML要素にBootstrapクラスを付与する
  */
 function applyBootstrapClasses(container: HTMLElement): void {

@@ -45,10 +45,30 @@ body {
   min-height: 100vh;
 }
 
+/* プレビューと目次をCSS Gridで一体配置するリーダーレイアウト */
+.mv-reader-layout {
+  --mv-preview-width: 860px;
+  --mv-toc-width: 240px;
+  display: grid;
+  grid-template-columns: minmax(0, var(--mv-preview-width)) var(--mv-toc-width);
+  justify-content: center;
+  align-items: start;
+  width: 100%;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+.mv-reader-layout.mv-toc-minimized-layout,
+.mv-reader-layout.mv-source-mode,
+.mv-reader-layout.mv-no-toc-layout {
+  grid-template-columns: minmax(0, var(--mv-preview-width));
+}
+
 /* プレビューコンテナのレイアウト */
 .mv-container {
-  max-width: 860px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: var(--mv-preview-width);
+  margin: 0;
   padding: 3rem 1.5rem;
   transition: max-width 0.2s ease;
 }
@@ -203,6 +223,9 @@ body {
 
 /* デスクトップ通常表示のTOC */
 .mv-toc-wrapper:not(.mv-toc-minimized) {
+  position: sticky;
+  top: 6rem;
+  width: 240px;
   opacity: 0.9;
 }
 
@@ -281,6 +304,9 @@ body {
    ミニインジケーターモード (短い横棒の縦並び)
    -------------------------------------------------------------------------- */
 #mv-toc-wrapper.mv-toc-minimized {
+  position: fixed;
+  top: var(--mv-toc-mini-top, 50%);
+  right: 10px;
   width: 56px;
   padding-left: 26px;
 }

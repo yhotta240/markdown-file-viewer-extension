@@ -593,6 +593,14 @@ function setupPanelEvents(
 
   let currentSettings: Required<Settings> = { ...DEFAULT_SETTINGS };
 
+  const applyPreviewWidth = (maxWidth: number) => {
+    const readerLayout = document.querySelector(".mv-reader-layout") as HTMLElement | null;
+    if (readerLayout) {
+      readerLayout.style.setProperty("--mv-preview-width", `${maxWidth}px`);
+    }
+    window.dispatchEvent(new Event("resize"));
+  };
+
   // 設定を DOM とプレビュー画面に適用する
   const applySettingsToDOM = (settings: Required<Settings>) => {
     const htmlEl = document.documentElement;
@@ -675,10 +683,7 @@ function setupPanelEvents(
     if (settings.maxWidth) {
       maxWidthSlider.value = String(settings.maxWidth);
       maxWidthBadge.textContent = `${settings.maxWidth}px`;
-      const container = document.querySelector(".mv-container") as HTMLElement;
-      if (container) {
-        container.style.maxWidth = `${settings.maxWidth}px`;
-      }
+      applyPreviewWidth(settings.maxWidth);
     }
 
     // 5. フォントサイズの適用
@@ -992,10 +997,7 @@ function setupPanelEvents(
   maxWidthSlider.addEventListener("input", (e) => {
     const val = Number((e.target as HTMLInputElement).value);
     maxWidthBadge.textContent = `${val}px`;
-    const container = document.querySelector(".mv-container") as HTMLElement;
-    if (container) {
-      container.style.maxWidth = `${val}px`;
-    }
+    applyPreviewWidth(val);
   });
 
   // 最大幅変更確定

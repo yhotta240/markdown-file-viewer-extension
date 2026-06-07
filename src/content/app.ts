@@ -50,17 +50,21 @@ export async function initMarkdownViewer(markdownText: string): Promise<void> {
   appRoot.id = "mv-app-root";
   document.body.appendChild(appRoot);
 
+  const readerLayout = document.createElement("main");
+  readerLayout.className = "mv-reader-layout";
+  appRoot.appendChild(readerLayout);
+
   // プレビュー表示用のメイン領域 (Bootstrapコンテナ)
   const containerWrapper = document.createElement("div");
   containerWrapper.className = "mv-container";
-  appRoot.appendChild(containerWrapper);
+  readerLayout.appendChild(containerWrapper);
 
   // プレビューのレンダリング (内部にプレビューとソースの両方の領域が生成されます)
   const previewArea = await renderPreview(markdownText);
   containerWrapper.appendChild(previewArea);
 
   // 目次 (TOC) の自動生成と構築
-  buildTOC(previewArea, appRoot);
+  buildTOC(previewArea, readerLayout);
   const fileInfo = collectMarkdownFileInfo(markdownText, previewArea);
   recordHistoryItem({
     url: fileInfo.url,
@@ -81,12 +85,14 @@ export async function initMarkdownViewer(markdownText: string): Promise<void> {
       if (mode === "source") {
         previewRender.style.display = "none";
         sourceRender.style.display = "block";
+        readerLayout.classList.add("mv-source-mode");
         if (tocWrapper) {
           tocWrapper.style.display = "none";
         }
       } else {
         sourceRender.style.display = "none";
         previewRender.style.display = "block";
+        readerLayout.classList.remove("mv-source-mode");
         if (tocWrapper) {
           tocWrapper.style.display = "";
           // 表示を戻したあとに配置スペースの再計算をトリガーする
