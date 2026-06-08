@@ -190,6 +190,13 @@ export function buildTOC(previewArea: HTMLElement, readerLayout: HTMLElement): v
     "click",
     (e) => {
       if (!tocWrapper.classList.contains("mv-toc-minimized")) return;
+
+      const target = e.target as Element | null;
+      if (target?.closest(".mv-toc-link")) {
+        hidePopup();
+        return;
+      }
+
       e.preventDefault();
       e.stopPropagation();
       if (popup.classList.contains("visible")) {
