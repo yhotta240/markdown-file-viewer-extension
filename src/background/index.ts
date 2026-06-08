@@ -29,6 +29,9 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === "install") {
     logInfo("拡張機能がインストールされました", "background");
     await setEnabled(true);
+    if (await isEnabled()) {
+      chrome.runtime.openOptionsPage();
+    }
   } else if (details.reason === "update") {
     logInfo(
       `拡張機能がアップデートされました (v${details.previousVersion ?? "?"} → v${EXTENSION_VERSION})`,

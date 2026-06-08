@@ -18,6 +18,7 @@ module.exports = {
   entry: {
     background: isDev ? path.join(SRC, "background", "dev.ts") : path.join(SRC, "background", "index.ts"),
     content: path.join(SRC, "content", "index.ts"),
+    options: path.join(SRC, "options.ts"),
     print: path.join(SRC, "print.ts")
   },
   output: {
@@ -88,6 +89,11 @@ module.exports = {
             filter: (resourcePath) => {
               return !/manifest\.(dev|prod)\.json$/.test(resourcePath);
             }
+          },
+          {
+            from: path.join(ROOT, "docs", "images"),
+            to: "images",
+            noErrorOnMissing: true
           },
           // 適切な manifest を manifest.json として出力
           {
