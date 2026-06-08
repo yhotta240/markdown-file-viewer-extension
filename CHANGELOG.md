@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.2] - 2026-06-09
+
+### Added
+
+- 初回設定用オプションページを追加
+
+### Fixed
+
+- ミニインジケーターの項目がクリックできない問題を修正
+
 ## [0.2.1] - 2026-06-07
 
 ### Added
