@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3] - 2026-09-28
+
+### Changed
+
+- 設定パネルと目次のスタイルを調整
+
 ## [0.2.2] - 2026-06-09
 
 ### Added
