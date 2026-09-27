@@ -48,12 +48,13 @@ body {
 /* プレビューと目次をCSS Gridで一体配置するリーダーレイアウト */
 .mv-reader-layout {
   --mv-preview-width: 860px;
-  --mv-toc-width: 240px;
+  --mv-toc-width: 320px;
   display: grid;
   grid-template-columns: minmax(0, var(--mv-preview-width)) var(--mv-toc-width);
   justify-content: center;
   align-items: start;
   width: 100%;
+  column-gap: 1.5rem;
   padding: 0 1rem;
   box-sizing: border-box;
 }
@@ -64,12 +65,17 @@ body {
   grid-template-columns: minmax(0, var(--mv-preview-width));
 }
 
+/* ミニ目次の表示領域を避けるため、プレビューを少し左寄せにする */
+.mv-reader-layout.mv-toc-minimized-layout {
+  padding-right: 3rem;
+}
+
 /* プレビューコンテナのレイアウト */
 .mv-container {
   width: 100%;
   max-width: var(--mv-preview-width);
   margin: 0;
-  padding: 3rem 1.5rem;
+  padding: 3rem 0.6rem 5rem;
   transition: max-width 0.2s ease;
 }
 
@@ -202,7 +208,7 @@ body {
    目次 (TOC) & レスポンシブナビゲーション
    ========================================================================== */
 .mv-toc-wrapper {
-  max-width: 240px;
+  max-width: 320px;
   max-height: calc(100vh - 12rem);
   overflow: visible; /* ポップアップが外側にはみ出せるよう visible にする */
   z-index: 999;
@@ -225,7 +231,7 @@ body {
 .mv-toc-wrapper:not(.mv-toc-minimized) {
   position: sticky;
   top: 6rem;
-  width: 240px;
+  width: 320px;
   opacity: 0.9;
 }
 
@@ -317,7 +323,6 @@ body {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
   align-items: flex-end;
 }
 
@@ -325,7 +330,7 @@ body {
   position: relative;
   display: flex;
   align-items: center;
-  height: 20px;
+  height: 15px;
 }
 
 /* <a> 全体をクリック領域にし、::before で視覚バーを描画 */
@@ -334,7 +339,7 @@ body {
   align-items: center;
   justify-content: flex-end;
   width: 30px;
-  height: 20px;
+  height: 10px;
   background: none;
   text-decoration: none;
   cursor: pointer;
@@ -343,7 +348,7 @@ body {
 #mv-toc-wrapper.mv-toc-minimized .mv-toc-link::before {
   content: "";
   display: block;
-  height: 4px;
+  height: 3px;
   width: 18px;
   background-color: var(--bs-border-color);
   border-radius: 3px;
@@ -361,14 +366,14 @@ body {
 #mv-toc-wrapper.mv-toc-minimized .mv-toc-item:hover .mv-toc-link::before {
   width: 28px;
   background-color: var(--bs-body-color);
-  height: 5px;
+  height: 4px;
 }
 
 /* 現在位置のアクティブ強調表示 */
 #mv-toc-wrapper.mv-toc-minimized .mv-toc-item.active .mv-toc-link::before {
   width: 30px;
   background-color: var(--mv-btn-bg);
-  height: 6px;
+  height: 5px;
 }
 
 /* ミニモード用 JS 生成ポップアップ */
@@ -462,6 +467,22 @@ body {
   transition:
     transform 0.25s ease-in-out,
     visibility 0.25s ease-in-out !important;
+}
+
+.mv-offcanvas .offcanvas-header {
+  padding: 0.5rem 0.75rem;
+}
+
+.mv-offcanvas .offcanvas-title {
+  font-size: 1.1rem;
+}
+
+.mv-offcanvas .offcanvas-body {
+  padding: 0.75rem;
+}
+
+.mv-settings-section .form-range {
+  height: 1rem;
 }
 
 /* ダークモード時の設定パネル内のテキスト色・コントラストの改善 */
