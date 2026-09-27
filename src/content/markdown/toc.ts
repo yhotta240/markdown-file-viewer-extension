@@ -38,14 +38,17 @@ function updateTocResponsive(
     return;
   }
 
-  const desktopTocWidth = 240;
+  const desktopTocWidth = 320;
   const layoutMargin = 32;
+  const readerLayoutStyle = getComputedStyle(readerLayout);
   const configuredPreviewWidth = Number.parseFloat(
-    getComputedStyle(readerLayout).getPropertyValue("--mv-preview-width"),
+    readerLayoutStyle.getPropertyValue("--mv-preview-width"),
   );
   const previewWidth = Number.isFinite(configuredPreviewWidth) ? configuredPreviewWidth : 860;
+  const configuredLayoutGap = Number.parseFloat(readerLayoutStyle.columnGap);
+  const layoutGap = Number.isFinite(configuredLayoutGap) ? configuredLayoutGap : 0;
   const windowWidth = window.innerWidth;
-  const fullLayoutWidth = previewWidth + desktopTocWidth;
+  const fullLayoutWidth = previewWidth + desktopTocWidth + layoutGap;
   const isMinimized = !(windowWidth >= 1100 && windowWidth >= fullLayoutWidth + layoutMargin * 2);
 
   tocWrapper.classList.toggle("mv-toc-minimized", isMinimized);
@@ -154,13 +157,14 @@ export function buildTOC(previewArea: HTMLElement, readerLayout: HTMLElement): v
     const rect = tocWrapper.getBoundingClientRect();
     const popupH = popup.offsetHeight;
     const margin = 8;
+    const popupHorizontalOffset = 22;
     const popupW = popup.offsetWidth;
     const clampedTop = Math.min(
       Math.max(margin + popupH / 2, rect.top + rect.height / 2),
       window.innerHeight - margin - popupH / 2,
     );
     const clampedLeft = Math.min(
-      Math.max(margin, rect.left - popupW - margin),
+      Math.max(margin, rect.left - popupW - margin + popupHorizontalOffset),
       window.innerWidth - popupW - margin,
     );
     popup.style.top = `${clampedTop}px`;
@@ -227,16 +231,14 @@ export function buildTOC(previewArea: HTMLElement, readerLayout: HTMLElement): v
       const margin = 8;
       // 70% を上限としつつ、itemH を floor で切り捨てるので totalH は必ず上限内に収まる
       const availH = window.innerHeight * 0.7;
-      const itemH = Math.max(2, Math.min(20, Math.floor(availH / n)));
-      const gapPx =
-        n > 1 ? Math.max(0, Math.min(6, Math.floor((availH - n * itemH) / (n - 1)))) : 0;
-      ul.style.gap = `${gapPx}px`;
+      const itemH = Math.max(2, Math.min(15, Math.floor(availH / n)));
+      const linkH = Math.max(2, Math.min(10, itemH));
       for (const li of tocItems) {
         li.style.height = `${itemH}px`;
         const a = li.querySelector("a") as HTMLElement | null;
-        if (a) a.style.height = `${itemH}px`;
+        if (a) a.style.height = `${linkH}px`;
       }
-      const totalH = n * itemH + (n > 1 ? (n - 1) * gapPx : 0);
+      const totalH = n * itemH;
       const idealTop = (window.innerHeight - totalH) / 2;
       tocWrapper.style.setProperty(
         "--mv-toc-mini-top",

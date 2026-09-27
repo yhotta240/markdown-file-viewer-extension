@@ -158,7 +158,7 @@ export function buildControlPanel(
 
   offcanvas.innerHTML = `
     <div class="offcanvas-header border-bottom py-3">
-      <img src="${chrome.runtime.getURL("icons/icon.png")}" alt="Icon" width="24" height="24" class="me-2">
+      <img src="${chrome.runtime.getURL("icons/icon.png")}" alt="Icon" width="20" height="20" class="me-2">
       <h5 class="offcanvas-title fw-bold">
         ${EXTENSION_SHORT_NAME} 設定
       </h5>
@@ -166,8 +166,8 @@ export function buildControlPanel(
     </div>
     <div class="offcanvas-body">
       <!-- 1. 表示設定 -->
-      <div class="mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="mb-3 mv-settings-section">
+        <div class="d-flex justify-content-between align-items-center mb-2">
           <h6 class="fw-bold mb-0 small text-uppercase tracking-wider text-muted">表示設定</h6>
           <button type="button" class="btn btn-xs fw-semibold py-1 px-2 border" id="mv-settings-reset-btn" 
                   style="font-size: 11px; height: auto; line-height: 1; border-radius: 4px; 
@@ -177,25 +177,25 @@ export function buildControlPanel(
         </div>
         
         <!-- カラーテーマ -->
-        <div class="mb-3">
-          <label class="form-label d-block small fw-semibold text-secondary mb-2">カラーテーマ</label>
+        <div class="mb-2">
+          <label class="form-label d-block small fw-semibold text-secondary mb-1">カラーテーマ</label>
           <div class="btn-group w-100" role="group">
             <input type="radio" class="btn-check" name="mv-theme" id="mv-theme-light" value="light">
-            <label class="btn btn-outline-secondary btn-sm py-2" for="mv-theme-light">ライト</label>
+            <label class="btn btn-outline-secondary btn-sm py-1" for="mv-theme-light">ライト</label>
             
             <input type="radio" class="btn-check" name="mv-theme" id="mv-theme-dark" value="dark">
-            <label class="btn btn-outline-secondary btn-sm py-2" for="mv-theme-dark">ダーク</label>
+            <label class="btn btn-outline-secondary btn-sm py-1" for="mv-theme-dark">ダーク</label>
             
             <input type="radio" class="btn-check" name="mv-theme" id="mv-theme-auto" value="auto">
-            <label class="btn btn-outline-secondary btn-sm py-2" for="mv-theme-auto">自動</label>
+            <label class="btn btn-outline-secondary btn-sm py-1" for="mv-theme-auto">自動</label>
 
             <input type="radio" class="btn-check" name="mv-theme" id="mv-theme-custom" value="custom">
-            <label class="btn btn-outline-secondary btn-sm py-2" for="mv-theme-custom">カスタム</label>
+            <label class="btn btn-outline-secondary btn-sm py-1" for="mv-theme-custom">カスタム</label>
           </div>
         </div>
 
         <!-- カスタムカラーパレット (テーマがカスタムの時のみ表示) -->
-        <div id="mv-custom-colors-container" class="mb-3 border rounded p-3 bg-body-tertiary" style="display: none;">
+        <div id="mv-custom-colors-container" class="mb-3 border rounded p-2 bg-body-tertiary" style="display: none;">
           <div class="row g-2">
             <div class="col-6">
               <label for="mv-custom-fg" class="form-label small text-secondary mb-1">文字色</label>
@@ -215,8 +215,8 @@ export function buildControlPanel(
         </div>
 
         <!-- フォント指定 -->
-        <div class="mb-3">
-          <label for="mv-font-family-select" class="form-label small fw-semibold text-secondary mb-2">フォントファミリー</label>
+        <div class="mb-2">
+          <label for="mv-font-family-select" class="form-label small fw-semibold text-secondary mb-1">フォントファミリー</label>
           <select class="form-select form-select-sm" id="mv-font-family-select">
             <option value="system">システム標準 (既定)</option>
             <option value="inter">Inter (Google Fonts)</option>
@@ -227,8 +227,8 @@ export function buildControlPanel(
         </div>
 
         <!-- コードブロックテーマ -->
-        <div class="mb-3">
-          <label for="mv-code-block-theme-select" class="form-label small fw-semibold text-secondary mb-2">コードブロックテーマ</label>
+        <div class="mb-2">
+          <label for="mv-code-block-theme-select" class="form-label small fw-semibold text-secondary mb-1">コードブロックテーマ</label>
           <select class="form-select form-select-sm" id="mv-code-block-theme-select">
             <option value="default">標準</option>
             <option value="github">GitHub</option>
@@ -239,8 +239,8 @@ export function buildControlPanel(
         </div>
 
         <!-- プレビュー最大横幅 -->
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-2">
+        <div class="mb-2">
+          <div class="d-flex justify-content-between">
             <label for="mv-max-width-slider" class="form-label small fw-semibold text-secondary mb-0">最大横幅</label>
             <span class="badge bg-secondary-subtle text-secondary-emphasis" id="mv-max-width-badge">860px</span>
           </div>
@@ -248,8 +248,8 @@ export function buildControlPanel(
         </div>
 
         <!-- 画像最大高さ -->
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-2">
+        <div class="mb-2">
+          <div class="d-flex justify-content-between">
             <label for="mv-image-max-height-slider" class="form-label small fw-semibold text-secondary mb-0">画像最大高さ</label>
             <span class="badge bg-secondary-subtle text-secondary-emphasis" id="mv-image-max-height-badge">70%</span>
           </div>
@@ -257,8 +257,8 @@ export function buildControlPanel(
         </div>
 
         <!-- フォントサイズ -->
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-2">
+        <div class="mb-2">
+          <div class="d-flex justify-content-between">
             <label for="mv-font-size-slider" class="form-label small fw-semibold text-secondary mb-0">フォントサイズ</label>
             <span class="badge bg-secondary-subtle text-secondary-emphasis" id="mv-font-size-badge">16px</span>
           </div>
@@ -266,23 +266,23 @@ export function buildControlPanel(
         </div>
       </div>
 
-      <hr class="my-4 text-muted">
+      <hr class="mb-3 text-muted">
 
       <!-- 1.5. 読み上げ設定 -->
-      <div class="mb-4">
-        <h6 class="fw-bold mb-3 small text-uppercase tracking-wider text-muted">読み上げ設定</h6>
+      <div class="mb-2 mv-settings-section">
+        <h6 class="fw-bold mb-2 small text-uppercase tracking-wider text-muted">読み上げ設定</h6>
 
         <!-- ボイス選択 -->
-        <div class="mb-3">
-          <label for="mv-tts-voice-select" class="form-label small fw-semibold text-secondary mb-2">ボイス</label>
+        <div class="mb-2">
+          <label for="mv-tts-voice-select" class="form-label small fw-semibold text-secondary mb-1">ボイス</label>
           <select class="form-select form-select-sm" id="mv-tts-voice-select">
             <option value="">システム標準</option>
           </select>
         </div>
 
         <!-- 速度 -->
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-2">
+        <div class="mb-2">
+          <div class="d-flex justify-content-between">
             <label for="mv-tts-rate-slider" class="form-label small fw-semibold text-secondary mb-0">速度</label>
             <span class="badge bg-secondary-subtle text-secondary-emphasis" id="mv-tts-rate-badge">1.0x</span>
           </div>
@@ -290,8 +290,8 @@ export function buildControlPanel(
         </div>
 
         <!-- ピッチ -->
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-2">
+        <div class="mb-2">
+          <div class="d-flex justify-content-between">
             <label for="mv-tts-pitch-slider" class="form-label small fw-semibold text-secondary mb-0">ピッチ</label>
             <span class="badge bg-secondary-subtle text-secondary-emphasis" id="mv-tts-pitch-badge">1.0</span>
           </div>
@@ -299,8 +299,8 @@ export function buildControlPanel(
         </div>
 
         <!-- 音量 -->
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-2">
+        <div class="mb-2">
+          <div class="d-flex justify-content-between">
             <label for="mv-tts-volume-slider" class="form-label small fw-semibold text-secondary mb-0">音量</label>
             <span class="badge bg-secondary-subtle text-secondary-emphasis" id="mv-tts-volume-badge">100%</span>
           </div>
@@ -308,11 +308,11 @@ export function buildControlPanel(
         </div>
       </div>
 
-      <hr class="my-4 text-muted">
+      <hr class="mb-3 text-muted">
 
       <!-- 2. アクション & シェア -->
-      <div class="mb-4">
-        <h6 class="fw-bold mb-3 small text-uppercase tracking-wider text-muted">シェア・操作</h6>
+      <div class="mb-3">
+        <h6 class="fw-bold mb-2 small text-uppercase tracking-wider text-muted">シェア・操作</h6>
         <div class="d-flex flex-column gap-2">
           <button type="button" class="btn btn-outline-primary btn-sm text-start py-2 px-3 d-flex align-items-center gap-2" id="mv-share-x">
             <i class="bi bi-twitter-x"></i>
@@ -329,23 +329,23 @@ export function buildControlPanel(
         </div>
       </div>
 
-      <hr class="my-4 text-muted">
+      <hr class="mb-3 text-muted">
 
       <!-- 2.5. 最近開いたファイル -->
       ${renderHistorySection()}
 
-      <hr class="my-4 text-muted">
+      <hr class="mb-3 text-muted">
 
       <!-- 3. ドキュメント -->
-      <div class="mb-4">
-        <h6 class="fw-bold mb-3 small text-uppercase tracking-wider text-muted">ドキュメント</h6>
+      <div class="mb-3">
+        <h6 class="fw-bold mb-2 small text-uppercase tracking-wider text-muted">ドキュメント</h6>
         ${docsHtml}
       </div>
 
-      <hr class="my-4 text-muted">
+      <hr class="mb-3 text-muted">
 
       <!-- 4. ログ -->
-      <div class="mb-4">
+      <div class="mb-3">
         <details class="mv-doc-details border rounded p-2 mb-2 bg-body-tertiary" id="mv-logs-details">
           <summary class="fw-semibold text-secondary small" style="cursor: pointer; user-select: none;">システムログ</summary>
           <div class="mt-2">
@@ -360,10 +360,10 @@ export function buildControlPanel(
         </details>
       </div>
 
-      <hr class="my-4 text-muted">
+      <hr class="mb-3 text-muted">
 
       <!-- 5. 情報 -->
-      <div class="mb-4">
+      <div class="mb-3">
         <h6 class="fw-bold mb-2 small text-uppercase tracking-wider text-muted">拡張機能情報</h6>
         <div class="border rounded p-3 bg-body-tertiary small text-secondary">
           <div class="d-flex justify-content-between mb-1">
