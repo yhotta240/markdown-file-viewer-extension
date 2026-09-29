@@ -232,11 +232,10 @@ export function buildTOC(previewArea: HTMLElement, readerLayout: HTMLElement): v
       // 70% を上限としつつ、itemH を floor で切り捨てるので totalH は必ず上限内に収まる
       const availH = window.innerHeight * 0.7;
       const itemH = Math.max(2, Math.min(15, Math.floor(availH / n)));
-      const linkH = Math.max(2, Math.min(10, itemH));
       for (const li of tocItems) {
         li.style.height = `${itemH}px`;
         const a = li.querySelector("a") as HTMLElement | null;
-        if (a) a.style.height = `${linkH}px`;
+        if (a) a.style.height = "100%";
       }
       const totalH = n * itemH;
       const idealTop = (window.innerHeight - totalH) / 2;
