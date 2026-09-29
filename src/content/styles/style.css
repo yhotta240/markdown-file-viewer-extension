@@ -84,6 +84,10 @@ body {
   line-height: 1.75;
 }
 
+#mv-preview-area a {
+  overflow-wrap: anywhere;
+}
+
 #mv-preview-area h1,
 #mv-preview-area h2,
 #mv-preview-area h3,
