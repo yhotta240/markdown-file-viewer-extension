@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.4] - 2026-10-01
+
+### Changed
+
+- 目次バーとプレビューUIを調整
+
+### Fixed
+
+- ポップオーバーのホバー動作を修正
+- 印刷プレビューの幅と文字サイズを修正
+
 ## [0.2.3] - 2026-09-28
 
 ### Changed
