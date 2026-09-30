@@ -172,6 +172,20 @@ body {
   transform: translateY(-2px);
 }
 
+/* トリガーとポップオーバーの間をつなぐ実DOMのホバー領域 */
+.mv-toolbar-hover-bridge {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  width: min(360px, calc(100vw - 2rem));
+  height: 0.75rem;
+  pointer-events: none;
+}
+
+.mv-toolbar:has(.mv-export-popover.show, .mv-file-info-popover.show) .mv-toolbar-hover-bridge {
+  pointer-events: auto;
+}
+
 /* ツールバー内の各ボタン（すべてデザイン統一） */
 .mv-toolbar-btn {
   width: 2.5rem;

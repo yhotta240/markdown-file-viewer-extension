@@ -141,6 +141,7 @@ export function buildControlPanel(
     </div>
 
     ${renderFileInfoPopover(fileInfo)}
+    <div class="mv-toolbar-hover-bridge" aria-hidden="true"></div>
   `;
   appRoot.appendChild(toolbar);
 
@@ -492,8 +493,8 @@ function setupPanelEvents(
     printPreview();
   });
 
-  bindHoverPopover({ trigger: fileInfoBtn, popover: fileInfoPopover });
-  bindHoverPopover({ trigger: exportBtn, popover: exportPopover });
+  bindHoverPopover({ trigger: fileInfoBtn, popover: fileInfoPopover, hoverRegion: toolbar });
+  bindHoverPopover({ trigger: exportBtn, popover: exportPopover, hoverRegion: toolbar });
 
   // 各エクスポートアクションのバインド
   exportPopover.querySelector("#mv-export-pdf")?.addEventListener("click", () => {
