@@ -775,9 +775,36 @@ body {
     color: #000 !important;
   }
 
+  .mv-reader-layout,
+  .mv-reader-layout.mv-toc-minimized-layout {
+    display: block;
+    padding: 0;
+  }
+
   .mv-container {
     padding: 0;
-    max-width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+  }
+
+  #mv-preview-area {
+    font-size: 11pt !important;
+  }
+
+  #mv-preview-area h1 {
+    font-size: 1.7em;
+  }
+
+  #mv-preview-area h2 {
+    font-size: 1.4em;
+  }
+
+  #mv-preview-area h3 {
+    font-size: 1.2em;
+  }
+
+  #mv-preview-area :is(h4, h5, h6) {
+    font-size: 1em;
   }
 
   /* コントロールUIを印刷から除外 */
